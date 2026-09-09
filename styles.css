@@ -263,7 +263,7 @@ img { display: block; max-width: 100%; }
 /* La cámara conserva la resolución y proporción reales, sin espejo ni recorte. */
 .camera-stage { background: #eef3eb; }
 .camera-live video, .camera-review img { object-fit: contain; object-position: center; transform: none !important; image-rendering: auto; background: #eef3eb; }
-.camera-live video { transform: scaleX(-1) !important; }
+.camera-live video { transform: none !important; }
 .camera-review img { transform: none !important; }
 
 /* El encuadre y la revisión muestran exactamente el cuadrado que se usará. */
@@ -294,16 +294,25 @@ img { display: block; max-width: 100%; }
 .modal-backdrop { overflow: hidden; overscroll-behavior: contain; }
 .camera-dialog, .result-dialog { scrollbar-width: none; -ms-overflow-style: none; }
 .camera-dialog::-webkit-scrollbar, .result-dialog::-webkit-scrollbar { display: none; width: 0; height: 0; }
-.result-dialog { max-height: calc(100dvh - 24px); padding-bottom: 12px; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }
+.result-dialog { max-height: calc(100dvh - 24px); padding-bottom: 8px; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }
 
 @media (max-height: 760px) {
-  .modal-backdrop { place-items: start center; padding: 12px; }
-  .result-dialog { padding: 22px 22px 12px; }
+  .modal-backdrop { place-items: center; padding: 12px; }
+  .result-dialog { padding: 22px 22px 8px; }
   .result-dialog .result-icon { width: 58px; height: 58px; border-radius: 20px; font-size: 29px; }
   .result-dialog h2 { margin-top: 6px; font-size: 42px; }
   .result-time { margin: 14px auto; padding: 10px 18px; }
   .result-comparison { margin: 12px auto 15px; }
 }
+
+/* Selector de cámara para celulares con frontal/trasera y tótems con webcam USB. */
+.camera-picker:not(.hidden) { display: grid; gap: 6px; margin: -4px 0 12px; }
+.camera-picker > label { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .05em; text-transform: uppercase; }
+.camera-picker-row { display: flex; gap: 8px; align-items: stretch; }
+.camera-picker select { min-width: 0; flex: 1; padding: 10px 11px; color: var(--secondary); background: #f7f4fb; border: 1px solid rgba(79,59,135,.2); border-radius: 11px; font-size: 11px; }
+.camera-picker .secondary-button { flex: 0 0 auto; min-height: 42px; padding: 10px 12px; }
+.camera-picker .secondary-button:disabled { opacity: .55; cursor: not-allowed; }
+.camera-live video { transform: none !important; }
 
 .mix-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; padding-top: 20px; margin-top: 20px; border-top: 1px solid rgba(85,135,54,.15); }
 .mix-heading h3 { margin: 0; color: var(--secondary); font-size: 17px; letter-spacing: -.04em; }

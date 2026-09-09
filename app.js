@@ -19,6 +19,10 @@ const state = {
   moves: 0,
   capturedData: null,
   cameraStream: null,
+  cameraDevices: [],
+  activeCameraId: '',
+  cameraFacingMode: 'environment',
+  cameraSwitching: false,
   drag: null,
   suppressClick: false,
   imageRequestId: 0,
@@ -451,6 +455,7 @@ function startTimer() {
 
 function startGame() {
   cancelActiveDrag();
+  resetResultScroll();
   stopTimer();
   state.status = 'playing';
   state.timeLeft = state.seconds;
@@ -504,11 +509,13 @@ function finishGame(won) {
   $('#result-time').textContent = formatTime(elapsed);
   $('#result-reference-image').src = finalImage;
   renderResultBoardPreview(finalTiles, finalSize, finalImage);
+  resetResultScroll();
   $('#result-modal').classList.remove('hidden');
 }
 
 function returnToSetup() {
   cancelActiveDrag();
+  resetResultScroll();
   stopTimer();
   state.status = 'setup';
   $('#result-modal').classList.add('hidden');
@@ -518,10 +525,15 @@ function returnToSetup() {
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
+function resetResultScroll() {
+  $('#result-modal').scrollTop = 0;
+  $('.result-dialog').scrollTop = 0;
+}
+
 function stopCamera() {
-  if (!state.cameraStream) return;
-  state.cameraStream.getTracks().forEach((track) => track.stop());
+  state.cameraStream?.getTracks().forEach((track) => track.stop());
   state.cameraStream = null;
+  state.activeCameraId = '';
   $('#camera-video').srcObject = null;
 }
 
@@ -536,6 +548,125 @@ async function getCameraPermissionState() {
   }
 }
 
+function describeCamera(device, index) {
+  const label = (device.label || '').toLowerCase();
+  if (/back|rear|environment|trasera|posterior/.test(label)) return 'Cámara trasera';
+  if (/front|user|frontal|selfie/.test(label)) return 'Cámara delantera';
+  if (/usb|webcam|external|externa/.test(label)) return 'Webcam USB';
+  return `Cámara ${index + 1}`;
+}
+
+function renderCameraDevices() {
+  const picker = $('#camera-picker');
+  const select = $('#camera-select');
+  const switchButton = $('#switch-camera');
+  if (!picker || !select || !switchButton) return;
+  const activeId = state.activeCameraId || state.cameraStream?.getVideoTracks()[0]?.getSettings?.().deviceId || '';
+  select.innerHTML = '';
+  state.cameraDevices.forEach((device, index) => {
+    const option = document.createElement('option');
+    option.value = device.deviceId;
+    option.textContent = describeCamera(device, index);
+    option.selected = device.deviceId === activeId;
+    select.appendChild(option);
+  });
+  const hasMultiple = state.cameraDevices.length > 1;
+  picker.classList.toggle('hidden', !hasMultiple);
+  switchButton.disabled = !hasMultiple || state.cameraSwitching;
+  select.disabled = !hasMultiple || state.cameraSwitching;
+}
+
+async function refreshCameraDevices() {
+  if (!navigator.mediaDevices?.enumerateDevices) return;
+  try {
+    state.cameraDevices = (await navigator.mediaDevices.enumerateDevices())
+      .filter((device) => device.kind === 'videoinput');
+    renderCameraDevices();
+  } catch {
+    state.cameraDevices = [];
+    renderCameraDevices();
+  }
+}
+
+function getCameraConstraints(cameraId = '') {
+  const video = {
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+    frameRate: { ideal: 30 }
+  };
+  if (cameraId) video.deviceId = { exact: cameraId };
+  else video.facingMode = { ideal: state.cameraFacingMode };
+  return { video, audio: false };
+}
+
+async function requestCameraStream(cameraId = '') {
+  try {
+    return await navigator.mediaDevices.getUserMedia(getCameraConstraints(cameraId));
+  } catch (error) {
+    // Si el celular no expone el modo preferido, probamos cualquier cámara disponible.
+    if (!cameraId && error.name === 'OverconstrainedError') {
+      return navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
+        audio: false
+      });
+    }
+    throw error;
+  }
+}
+
+async function prepareCameraTrack(track) {
+  try {
+    const capabilities = track.getCapabilities?.() || {};
+    const maxWidth = capabilities.width?.max || 1920;
+    const maxHeight = capabilities.height?.max || 1080;
+    await track.applyConstraints({
+      width: { ideal: Math.min(maxWidth, 1920), max: maxWidth },
+      height: { ideal: Math.min(maxHeight, 1080), max: maxHeight },
+      frameRate: { ideal: 30 }
+    });
+  } catch {
+    // Algunas cámaras USB o WebView solo aceptan su resolución predeterminada.
+  }
+}
+
+async function startCameraStream(cameraId = '') {
+  const stream = await requestCameraStream(cameraId);
+  const oldStream = state.cameraStream;
+  const track = stream.getVideoTracks()[0];
+  await prepareCameraTrack(track);
+  oldStream?.getTracks().forEach((oldTrack) => oldTrack.stop());
+  state.cameraStream = stream;
+  state.activeCameraId = track.getSettings?.().deviceId || cameraId || '';
+  const video = $('#camera-video');
+  video.srcObject = stream;
+  await video.play();
+  await refreshCameraDevices();
+}
+
+async function changeCamera(cameraId) {
+  if (state.cameraSwitching || !cameraId || cameraId === state.activeCameraId) return;
+  state.cameraSwitching = true;
+  renderCameraDevices();
+  $('#camera-status').textContent = 'Cambiando de cámara…';
+  try {
+    await startCameraStream(cameraId);
+    $('#camera-status').textContent = 'Ajusta el encuadre y toca tomar foto';
+  } catch (error) {
+    $('#camera-status').textContent = 'No se pudo cambiar de cámara. Continúa con la cámara actual.';
+    console.warn('Camera switch unavailable:', error.message);
+  } finally {
+    state.cameraSwitching = false;
+    renderCameraDevices();
+  }
+}
+
+async function cycleCamera() {
+  if (state.cameraDevices.length < 2) return;
+  const activeIndex = Math.max(0, state.cameraDevices.findIndex((device) => device.deviceId === state.activeCameraId));
+  const nextDevice = state.cameraDevices[(activeIndex + 1) % state.cameraDevices.length];
+  if (nextDevice) await changeCamera(nextDevice.deviceId);
+}
+
 function hasActiveCamera() {
   return Boolean(state.cameraStream?.getTracks().some((track) => track.readyState === 'live'));
 }
@@ -546,7 +677,7 @@ function pauseCameraPreview() {
 
 async function openCamera() {
   const video = $('#camera-video');
-  video.style.setProperty('transform', 'scaleX(-1)', 'important');
+  video.style.setProperty('transform', 'none', 'important');
   $('#camera-modal').classList.remove('hidden');
   $('#camera-live').classList.remove('hidden');
   $('#camera-review').classList.add('hidden');
@@ -562,31 +693,12 @@ async function openCamera() {
       return;
     }
     if (!hasActiveCamera()) {
-      state.cameraStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          frameRate: { ideal: 30 }
-        },
-        audio: false
-      });
-      const track = state.cameraStream.getVideoTracks()[0];
-      try {
-        const capabilities = track.getCapabilities?.() || {};
-        const maxWidth = capabilities.width?.max || 1920;
-        const maxHeight = capabilities.height?.max || 1080;
-        await track.applyConstraints({
-          width: { ideal: Math.min(maxWidth, 1920), max: maxWidth },
-          height: { ideal: Math.min(maxHeight, 1080), max: maxHeight },
-          frameRate: { ideal: 30 }
-        });
-      } catch {
-        // Algunas cámaras solo aceptan su resolución predeterminada.
-      }
+      await startCameraStream();
+    } else {
+      video.srcObject = state.cameraStream;
+      await video.play();
+      await refreshCameraDevices();
     }
-    video.srcObject = state.cameraStream;
-    await video.play();
     $('#camera-status').textContent = 'Ajusta el encuadre y toca tomar foto';
   } catch (error) {
     $('#camera-status').textContent = 'No se pudo abrir la cámara. Puedes subir una imagen.';
@@ -613,12 +725,7 @@ function capturePhoto() {
   const context = canvas.getContext('2d');
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = 'high';
-  // La cámara del tótem entrega el video espejado; lo corregimos también en la foto.
-  context.save();
-  context.translate(canvas.width, 0);
-  context.scale(-1, 1);
   context.drawImage(video, sourceX, sourceY, sourceSide, sourceSide, 0, 0, canvas.width, canvas.height);
-  context.restore();
   state.capturedData = canvas.toDataURL('image/jpeg', .9);
   $('#captured-image').src = state.capturedData;
   pauseCameraPreview();
@@ -670,6 +777,8 @@ $('#camera-button').addEventListener('click', openCamera);
 $('#close-camera').addEventListener('click', closeCamera);
 $('#cancel-camera-live').addEventListener('click', closeCamera);
 $('#capture-photo').addEventListener('click', capturePhoto);
+$('#camera-select').addEventListener('change', (event) => changeCamera(event.target.value));
+$('#switch-camera').addEventListener('click', cycleCamera);
 $('#retake-photo').addEventListener('click', openCamera);
 $('#use-photo').addEventListener('click', () => {
   if (state.capturedData) setImage(state.capturedData, 'Foto tomada');

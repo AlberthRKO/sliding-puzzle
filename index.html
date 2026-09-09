@@ -74,12 +74,12 @@
                 <p class="source-intro">Elige una foto de tu galería o toma una nueva con la cámara.</p>
                 <label class="action-button primary-soft" for="file-input">
                   <span class="button-icon" aria-hidden="true">↑</span>
-                  <span><strong>Subir imagen</strong><small>JPG, PNG o WEBP</small></span>
+                  <span><strong>Subir imagen</strong><small>Galería, archivos · JPG, PNG o WEBP</small></span>
                 </label>
-                <input id="file-input" type="file" accept="image/*" capture="environment" />
+                <input id="file-input" type="file" accept="image/*" />
                 <button class="action-button secondary-soft" id="camera-button" type="button">
                   <span class="button-icon" aria-hidden="true">⌾</span>
-                  <span><strong>Tomar una foto</strong><small>Usar la cámara del tótem</small></span>
+                  <span><strong>Tomar una foto</strong><small>Usar la cámara del dispositivo</small></span>
                 </button>
                 <p class="source-tip"><span>✦</span> Para mejores resultados usa una imagen cuadrada y bien iluminada.</p>
               </div>
@@ -209,12 +209,19 @@
       <div class="camera-dialog">
         <div class="modal-topline"><span class="section-number">cámara</span><button class="close-button" id="close-camera" type="button" aria-label="Cerrar cámara">×</button></div>
         <h2 id="camera-title">Toma tu foto</h2>
-        <p class="modal-lead">La zona cuadrada marcada en verde será el recorte final del puzzle.</p>
-        <div class="camera-stage">
-          <div class="camera-live" id="camera-live"><video id="camera-video" autoplay playsinline muted></video><span class="camera-frame-corner"></span></div>
-          <div class="camera-review hidden" id="camera-review"><img id="captured-image" alt="Foto capturada para revisar" /></div>
-          <canvas id="camera-canvas" hidden></canvas>
-          <p class="camera-status" id="camera-status">Solicitando acceso a la cámara…</p>
+        <p class="modal-lead">La zona cuadrada marcada en verde será el recorte final. Si hay varias cámaras, podrás elegirla.</p>
+          <div class="camera-stage">
+            <div class="camera-live" id="camera-live"><video id="camera-video" autoplay playsinline muted></video><span class="camera-frame-corner"></span></div>
+            <div class="camera-review hidden" id="camera-review"><img id="captured-image" alt="Foto capturada para revisar" /></div>
+            <canvas id="camera-canvas" hidden></canvas>
+            <p class="camera-status" id="camera-status">Solicitando acceso a la cámara…</p>
+          </div>
+        <div class="camera-picker hidden" id="camera-picker">
+          <label for="camera-select">Cámara activa</label>
+          <div class="camera-picker-row">
+            <select id="camera-select" aria-label="Seleccionar cámara"></select>
+            <button class="secondary-button" id="switch-camera" type="button">↔ Cambiar</button>
+          </div>
         </div>
         <div class="camera-actions" id="camera-live-actions"><button class="secondary-button" id="cancel-camera-live" type="button">Cancelar</button><button class="primary-button" id="capture-photo" type="button"><span aria-hidden="true">●</span> Tomar foto</button></div>
         <div class="camera-actions hidden" id="camera-review-actions"><button class="secondary-button" id="retake-photo" type="button">Repetir foto</button><button class="primary-button" id="use-photo" type="button">Usar esta foto <span aria-hidden="true">→</span></button></div>
