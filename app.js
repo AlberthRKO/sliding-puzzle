@@ -22,6 +22,7 @@ const state = {
   cameraDevices: [],
   activeCameraId: '',
   cameraFacingMode: 'environment',
+  cameraMirror: false,
   cameraSwitching: false,
   drag: null,
   suppressClick: false,
@@ -526,8 +527,14 @@ function returnToSetup() {
 }
 
 function resetResultScroll() {
-  $('#result-modal').scrollTop = 0;
-  $('.result-dialog').scrollTop = 0;
+  const modal = $('#result-modal');
+  const dialog = $('.result-dialog');
+  modal.scrollTop = 0;
+  dialog.scrollTop = 0;
+  window.requestAnimationFrame(() => {
+    modal.scrollTop = 0;
+    dialog.scrollTop = 0;
+  });
 }
 
 function stopCamera() {
@@ -552,8 +559,23 @@ function describeCamera(device, index) {
   const label = (device.label || '').toLowerCase();
   if (/back|rear|environment|trasera|posterior/.test(label)) return 'Cámara trasera';
   if (/front|user|frontal|selfie/.test(label)) return 'Cámara delantera';
-  if (/usb|webcam|external|externa/.test(label)) return 'Webcam USB';
+  if (/usb|webcam|external|externa|pc camera|logitech|integrated|built[- ]?in|facetime|hd camera/.test(label)) return 'Webcam USB';
   return `Cámara ${index + 1}`;
+}
+
+function shouldMirrorCamera() {
+  const activeDevice = state.cameraDevices.find((device) => device.deviceId === state.activeCameraId);
+  const label = (activeDevice?.label || '').toLowerCase();
+  const isBackCamera = /back|rear|environment|trasera|posterior/.test(label);
+  const isMirroredCamera = /front|user|frontal|selfie|usb|webcam|external|externa|pc camera|logitech|integrated|built[- ]?in|facetime|hd camera/.test(label);
+  if (isBackCamera) return false;
+  if (isMirroredCamera) return true;
+  return state.cameraFacingMode === 'user' || state.cameraFacingMode === 'unknown';
+}
+
+function updateCameraPresentation() {
+  state.cameraMirror = shouldMirrorCamera();
+  $('#camera-video').style.setProperty('transform', state.cameraMirror ? 'scaleX(-1)' : 'none', 'important');
 }
 
 function renderCameraDevices() {
@@ -581,6 +603,9 @@ async function refreshCameraDevices() {
   try {
     state.cameraDevices = (await navigator.mediaDevices.enumerateDevices())
       .filter((device) => device.kind === 'videoinput');
+    if (!state.activeCameraId && state.cameraDevices.length === 1) {
+      state.activeCameraId = state.cameraDevices[0].deviceId || '';
+    }
     renderCameraDevices();
   } catch {
     state.cameraDevices = [];
@@ -595,7 +620,9 @@ function getCameraConstraints(cameraId = '') {
     frameRate: { ideal: 30 }
   };
   if (cameraId) video.deviceId = { exact: cameraId };
-  else video.facingMode = { ideal: state.cameraFacingMode };
+  else if (state.cameraFacingMode === 'user' || state.cameraFacingMode === 'environment') {
+    video.facingMode = { ideal: state.cameraFacingMode };
+  }
   return { video, audio: false };
 }
 
@@ -637,15 +664,24 @@ async function startCameraStream(cameraId = '') {
   oldStream?.getTracks().forEach((oldTrack) => oldTrack.stop());
   state.cameraStream = stream;
   state.activeCameraId = track.getSettings?.().deviceId || cameraId || '';
+  const detectedFacingMode = track.getSettings?.().facingMode;
+  if (detectedFacingMode === 'user' || detectedFacingMode === 'environment') state.cameraFacingMode = detectedFacingMode;
+  else if (cameraId) state.cameraFacingMode = 'unknown';
   const video = $('#camera-video');
   video.srcObject = stream;
   await video.play();
   await refreshCameraDevices();
+  updateCameraPresentation();
 }
 
 async function changeCamera(cameraId) {
   if (state.cameraSwitching || !cameraId || cameraId === state.activeCameraId) return;
   state.cameraSwitching = true;
+  const selectedDevice = state.cameraDevices.find((device) => device.deviceId === cameraId);
+  const selectedLabel = (selectedDevice?.label || '').toLowerCase();
+  if (/front|user|frontal|selfie/.test(selectedLabel)) state.cameraFacingMode = 'user';
+  else if (/back|rear|environment|trasera|posterior/.test(selectedLabel)) state.cameraFacingMode = 'environment';
+  else state.cameraFacingMode = 'unknown';
   renderCameraDevices();
   $('#camera-status').textContent = 'Cambiando de cámara…';
   try {
@@ -677,7 +713,7 @@ function pauseCameraPreview() {
 
 async function openCamera() {
   const video = $('#camera-video');
-  video.style.setProperty('transform', 'none', 'important');
+  updateCameraPresentation();
   $('#camera-modal').classList.remove('hidden');
   $('#camera-live').classList.remove('hidden');
   $('#camera-review').classList.add('hidden');
@@ -698,6 +734,7 @@ async function openCamera() {
       video.srcObject = state.cameraStream;
       await video.play();
       await refreshCameraDevices();
+      updateCameraPresentation();
     }
     $('#camera-status').textContent = 'Ajusta el encuadre y toca tomar foto';
   } catch (error) {
@@ -723,9 +760,18 @@ function capturePhoto() {
   canvas.width = Math.round(sourceSide * scale);
   canvas.height = Math.round(sourceSide * scale);
   const context = canvas.getContext('2d');
+  if (!context) return;
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = 'high';
-  context.drawImage(video, sourceX, sourceY, sourceSide, sourceSide, 0, 0, canvas.width, canvas.height);
+  if (state.cameraMirror) {
+    context.save();
+    context.translate(canvas.width, 0);
+    context.scale(-1, 1);
+    context.drawImage(video, sourceX, sourceY, sourceSide, sourceSide, 0, 0, canvas.width, canvas.height);
+    context.restore();
+  } else {
+    context.drawImage(video, sourceX, sourceY, sourceSide, sourceSide, 0, 0, canvas.width, canvas.height);
+  }
   state.capturedData = canvas.toDataURL('image/jpeg', .9);
   $('#captured-image').src = state.capturedData;
   pauseCameraPreview();
