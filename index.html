@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#558736" />
+    <title>RomaReto · Puzzle interactivo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#inicio" aria-label="RomaReto, volver al inicio">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </span>
+          <span class="brand-copy">
+            <strong>RomaReto</strong>
+            <small>ecosistema roma</small>
+          </span>
+        </a>
+        <div class="topbar-note"><span class="sparkle">✦</span> elige · configura · juega</div>
+      </header>
+
+      <main class="setup-screen" id="setup-screen">
+        <section class="hero" id="inicio">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Puzzle interactivo</p>
+            <h1>Elige una imagen<br /><em>y comienza.</em></h1>
+            <p class="hero-lead">
+              Prepara tu imagen, elige la dificultad y empieza a jugar.
+            </p>
+            <div class="hero-pills" aria-label="Características del juego">
+              <span><b>60</b> segundos</span>
+              <span><b>2</b> niveles</span>
+              <span><b>∞</b> reintentos</span>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-label="Vista previa de un puzzle de 3 por 3">
+            <div class="visual-glow"></div>
+            <div class="mini-puzzle">
+              <span class="mini-tile tile-a">✦</span>
+              <span class="mini-tile tile-b">◒</span>
+              <span class="mini-tile tile-c">●</span>
+              <span class="mini-tile tile-d">↗</span>
+              <span class="mini-tile tile-e">▰</span>
+              <span class="mini-tile tile-f">◇</span>
+              <span class="mini-tile tile-g">+</span>
+              <span class="mini-tile tile-h">∿</span>
+              <span class="mini-tile tile-empty"></span>
+            </div>
+            <span class="visual-label label-top">mueve</span>
+            <span class="visual-label label-bottom">una pieza a la vez</span>
+          </div>
+        </section>
+
+        <section class="setup-grid" aria-label="Configuración de la partida">
+          <article class="panel image-card">
+            <div class="section-heading">
+              <div>
+                <p class="section-number">01 / imagen</p>
+                <h2>Hazlo tuyo</h2>
+              </div>
+              <span class="status-chip"><i></i> listo para jugar</span>
+            </div>
+
+            <div class="image-source-layout">
+              <div class="preview-frame">
+                <img id="image-preview" alt="Vista previa de la imagen seleccionada" />
+                <div class="preview-overlay"><span>tu imagen</span><strong id="preview-caption">Ecosistema Roma</strong></div>
+              </div>
+              <div class="source-actions">
+                <p class="source-intro">Elige una foto de tu galería o toma una nueva con la cámara.</p>
+                <label class="action-button primary-soft" for="file-input">
+                  <span class="button-icon" aria-hidden="true">↑</span>
+                  <span><strong>Subir imagen</strong><small>JPG, PNG o WEBP</small></span>
+                </label>
+                <input id="file-input" type="file" accept="image/*" capture="environment" />
+                <button class="action-button secondary-soft" id="camera-button" type="button">
+                  <span class="button-icon" aria-hidden="true">⌾</span>
+                  <span><strong>Tomar una foto</strong><small>Usar la cámara del tótem</small></span>
+                </button>
+                <p class="source-tip"><span>✦</span> Para mejores resultados usa una imagen cuadrada y bien iluminada.</p>
+              </div>
+            </div>
+          </article>
+
+          <aside class="panel instructions-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="section-number">cómo funciona</p>
+                <h2>Tu misión</h2>
+              </div>
+              <span class="round-icon" aria-hidden="true">?</span>
+            </div>
+            <ol class="instruction-list">
+              <li><span>01</span><div><strong>Escoge una imagen</strong><small>Puede ser tuya o una foto de la galería.</small></div></li>
+              <li><span>02</span><div><strong>Desliza las piezas</strong><small>Toca una pieza junto al espacio vacío.</small></div></li>
+              <li><span>03</span><div><strong>Completa la escena</strong><small>Ordénala antes de que llegue a cero.</small></div></li>
+            </ol>
+            <div class="tip-box"><span aria-hidden="true">☼</span><p><strong>Consejo:</strong> empieza por las esquinas y usa los números como guía.</p></div>
+          </aside>
+        </section>
+
+        <section class="panel mode-card" aria-labelledby="mode-title">
+          <div class="section-heading mode-heading">
+            <div>
+              <p class="section-number">02 / dificultad</p>
+              <h2 id="mode-title">Elige tu desafío</h2>
+            </div>
+            <p class="heading-note">Mismo tiempo. Distinto nivel de concentración.</p>
+          </div>
+
+          <div class="mode-grid" role="radiogroup" aria-label="Selecciona la dificultad">
+            <button class="mode-option active" type="button" data-mode="normal" role="radio" aria-checked="true">
+              <span class="mode-icon mode-icon-normal"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="mode-text"><strong>Normal</strong><small>9 piezas · ideal para empezar</small></span>
+              <span class="mode-check" aria-hidden="true">✓</span>
+            </button>
+            <button class="mode-option" type="button" data-mode="hard" role="radio" aria-checked="false">
+              <span class="mode-icon mode-icon-hard"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="mode-text"><strong>Difícil</strong><small>16 piezas · para mentes inquietas</small></span>
+              <span class="mode-check" aria-hidden="true">✓</span>
+            </button>
+          </div>
+
+          <div class="mix-heading">
+            <div>
+              <p class="section-number">03 / mezcla</p>
+              <h3>Elige el nivel de reto</h3>
+            </div>
+            <p>Más mezcla necesita más tiempo.</p>
+          </div>
+
+          <div class="mix-grid" role="radiogroup" aria-label="Selecciona el nivel de mezcla">
+            <button class="mix-option active" type="button" data-difficulty="easy" role="radio" aria-checked="true">
+              <span class="mix-dot">01</span><span><strong>Fácil</strong><small>5–8 movimientos</small></span><span class="mix-check" aria-hidden="true">✓</span>
+            </button>
+            <button class="mix-option" type="button" data-difficulty="normal" role="radio" aria-checked="false">
+              <span class="mix-dot">02</span><span><strong>Normal</strong><small>10–15 movimientos</small></span><span class="mix-check" aria-hidden="true">✓</span>
+            </button>
+            <button class="mix-option" type="button" data-difficulty="hard" role="radio" aria-checked="false">
+              <span class="mix-dot">03</span><span><strong>Difícil</strong><small>16–24 movimientos</small></span><span class="mix-check" aria-hidden="true">✓</span>
+            </button>
+          </div>
+
+          <div class="mode-details">
+            <div><span class="detail-icon">◷</span><span><small>Tiempo límite</small><strong id="mode-time">01:30 min</strong></span></div>
+            <div><span class="detail-icon">↝</span><span><small>Movimiento</small><strong>Toque o arrastre</strong></span></div>
+            <div><span class="detail-icon">♧</span><span><small>Reintentos</small><strong>Los que quieras</strong></span></div>
+          </div>
+
+          <div class="setup-footer">
+            <div class="ready-message"><span class="ready-check">✓</span><span><strong>Todo listo</strong><small>Tu puzzle se mezclará al empezar.</small></span></div>
+            <button class="start-button" id="start-button" type="button"><span>Iniciar juego</span><b aria-hidden="true">→</b></button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer"><span>RomaReto</span><span>un reto para todas las edades</span><span>hecho para tocar</span></footer>
+    </div>
+
+    <div class="game-screen hidden" id="game-screen">
+      <header class="game-topbar">
+        <button class="back-button" id="back-to-setup" type="button"><span aria-hidden="true">←</span> Cambiar imagen</button>
+        <div class="game-heading"><span class="eyebrow"><span class="eyebrow-dot"></span> partida en curso</span><strong id="game-mode-title">Modo normal</strong></div>
+        <button class="restart-button" id="restart-game" type="button"><span aria-hidden="true">↻</span> Volver a mezclar</button>
+      </header>
+
+      <main class="game-layout">
+        <section class="board-zone">
+          <div class="game-stats">
+            <div class="live-stat timer-stat"><span class="stat-label">tiempo restante</span><strong id="timer">01:00</strong><span class="timer-track"><i id="timer-bar"></i></span></div>
+            <div class="live-stat"><span class="stat-label">movimientos</span><strong id="move-count">0</strong><span class="stat-sub">pasos dados</span></div>
+            <div class="live-stat"><span class="stat-label">mejor tiempo</span><strong id="best-time">—</strong><span class="stat-sub">en este tótem</span></div>
+          </div>
+
+          <div class="board-wrap">
+            <div class="puzzle-board" id="puzzle-board" role="grid" aria-label="Puzzle deslizante"></div>
+            <div class="board-corner corner-tl"></div><div class="board-corner corner-br"></div>
+          </div>
+
+          <div class="game-helper">
+            <span class="helper-icon" aria-hidden="true">✦</span>
+            <p><strong>¿Cómo jugar?</strong> Toca o arrastra una pieza alineada con el espacio vacío para mover toda la fila.</p>
+            <span class="helper-key">toca para mover</span>
+          </div>
+        </section>
+
+        <aside class="game-sidebar">
+          <div class="side-card mission-card">
+            <p class="section-number">tu misión</p>
+            <h2>Completa<br /><em>la imagen.</em></h2>
+            <p id="goal-text">Ordena las 9 piezas para revelar la foto completa.</p>
+            <div class="progress-meta"><span>progreso</span><strong id="progress-text">0%</strong></div>
+            <div class="progress-track"><i id="progress-bar"></i></div>
+            <div class="side-card-row"><span>piezas bien ubicadas</span><strong id="correct-count">0 / 8</strong></div>
+          </div>
+          <div class="side-card reference-card">
+            <div class="reference-image-wrap"><img id="reference-image" alt="Imagen de referencia completa" /><span>referencia</span></div>
+          </div>
+          <button class="side-new-button" id="side-new-image" type="button"><span aria-hidden="true">＋</span> Elegir otra imagen</button>
+        </aside>
+      </main>
+    </div>
+
+    <div class="modal-backdrop hidden" id="camera-modal" role="dialog" aria-modal="true" aria-labelledby="camera-title">
+      <div class="camera-dialog">
+        <div class="modal-topline"><span class="section-number">cámara</span><button class="close-button" id="close-camera" type="button" aria-label="Cerrar cámara">×</button></div>
+        <h2 id="camera-title">Toma tu foto</h2>
+        <p class="modal-lead">La zona cuadrada marcada en verde será el recorte final del puzzle.</p>
+        <div class="camera-stage">
+          <div class="camera-live" id="camera-live"><video id="camera-video" autoplay playsinline muted></video><span class="camera-frame-corner"></span></div>
+          <div class="camera-review hidden" id="camera-review"><img id="captured-image" alt="Foto capturada para revisar" /></div>
+          <canvas id="camera-canvas" hidden></canvas>
+          <p class="camera-status" id="camera-status">Solicitando acceso a la cámara…</p>
+        </div>
+        <div class="camera-actions" id="camera-live-actions"><button class="secondary-button" id="cancel-camera-live" type="button">Cancelar</button><button class="primary-button" id="capture-photo" type="button"><span aria-hidden="true">●</span> Tomar foto</button></div>
+        <div class="camera-actions hidden" id="camera-review-actions"><button class="secondary-button" id="retake-photo" type="button">Repetir foto</button><button class="primary-button" id="use-photo" type="button">Usar esta foto <span aria-hidden="true">→</span></button></div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop hidden" id="result-modal" role="dialog" aria-modal="true" aria-labelledby="result-title">
+      <div class="result-dialog">
+        <div class="result-orbit orbit-one"></div><div class="result-orbit orbit-two"></div>
+        <span class="result-icon" id="result-icon" aria-hidden="true">✦</span>
+        <p class="section-number" id="result-kicker">resultado</p>
+        <h2 id="result-title">¡Ganaste!</h2>
+        <p id="result-message">La imagen volvió a aparecer. ¡Qué buena jugada!</p>
+        <div class="result-time"><small>tu tiempo</small><strong id="result-time">00:00</strong></div>
+        <div class="result-comparison" aria-label="Comparación entre la referencia y tu resultado">
+          <div class="result-visual"><span>referencia</span><img id="result-reference-image" alt="Imagen de referencia completa" /></div>
+          <div class="result-visual"><span>tu resultado</span><div id="result-board-preview" class="result-board-preview" role="img" aria-label="Estado final del tablero"></div></div>
+        </div>
+        <div class="result-actions"><button class="primary-button" id="play-again" type="button">Jugar otra vez <span aria-hidden="true">↻</span></button><button class="secondary-button" id="result-new-image" type="button">Cambiar imagen</button></div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
