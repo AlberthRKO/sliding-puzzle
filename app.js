@@ -525,6 +525,17 @@ function stopCamera() {
   $('#camera-video').srcObject = null;
 }
 
+async function getCameraPermissionState() {
+  if (!navigator.permissions?.query) return 'unknown';
+  try {
+    const permission = await navigator.permissions.query({ name: 'camera' });
+    return permission.state;
+  } catch {
+    // Safari y algunos WebView no exponen el permiso de cámara.
+    return 'unknown';
+  }
+}
+
 function hasActiveCamera() {
   return Boolean(state.cameraStream?.getTracks().some((track) => track.readyState === 'live'));
 }
@@ -544,6 +555,12 @@ async function openCamera() {
   $('#camera-status').textContent = hasActiveCamera() ? 'Cámara lista. Ajusta el encuadre.' : 'Solicitando acceso a la cámara…';
   try {
     if (!navigator.mediaDevices?.getUserMedia) throw new Error('unsupported');
+    const permissionState = await getCameraPermissionState();
+    if (permissionState === 'denied') {
+      $('#camera-status').textContent = 'El acceso está bloqueado. Activa la cámara en los permisos del navegador.';
+      $('#camera-live-actions').classList.add('hidden');
+      return;
+    }
     if (!hasActiveCamera()) {
       state.cameraStream = await navigator.mediaDevices.getUserMedia({
         video: {
