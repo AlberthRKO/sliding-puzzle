@@ -9,6 +9,7 @@ const state = {
   imageName: 'Ecosistema Roma',
   mode: 'normal',
   difficulty: 'easy',
+  showGuide: true,
   size: 3,
   seconds: 90,
   timeLeft: 90,
@@ -131,6 +132,14 @@ function setDifficulty(difficulty) {
   });
 }
 
+function setGuide(showGuide) {
+  state.showGuide = Boolean(showGuide);
+  const toggle = $('#guide-toggle');
+  const status = $('#guide-status');
+  if (toggle) toggle.checked = state.showGuide;
+  if (status) status.textContent = state.showGuide ? 'números visibles' : 'sin números';
+}
+
 function getNeighbors(index) {
   const row = Math.floor(index / state.size);
   const col = index % state.size;
@@ -219,6 +228,7 @@ function correctTileCount() {
 function renderBoard() {
   const board = $('#puzzle-board');
   board.style.setProperty('--grid-size', state.size);
+  board.classList.toggle('no-guide', !state.showGuide);
   board.setAttribute('aria-label', `Puzzle de ${state.size} por ${state.size}. ${state.moves} movimientos.`);
   board.innerHTML = '';
   state.tiles.forEach((tile, index) => {
@@ -784,9 +794,11 @@ function capturePhoto() {
 
 setImage(DEFAULT_IMAGE, 'Ecosistema Roma');
 setMode('normal');
+setGuide(true);
 
 $$('.mode-option').forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
 $$('.mix-option').forEach((button) => button.addEventListener('click', () => setDifficulty(button.dataset.difficulty)));
+$('#guide-toggle').addEventListener('change', (event) => setGuide(event.currentTarget.checked));
 $('#start-button').addEventListener('click', async (event) => {
   if (state.status !== 'setup' || state.starting) return;
   const startButton = event.currentTarget;

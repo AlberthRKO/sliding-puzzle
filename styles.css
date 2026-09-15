@@ -328,4 +328,24 @@ img { display: block; max-width: 100%; }
 .mix-option strong { color: var(--secondary); font-size: 11px; }
 .mix-option small { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 7px; white-space: nowrap; }
 .mix-check { display: none; position: absolute; top: 7px; right: 7px; color: var(--primary); font-size: 11px; }
+
+/* Preferencia de guía para cada partida. */
+.guide-setting { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-top: 16px; }
+.guide-control { position: relative; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+.guide-control input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.guide-check { position: relative; display: grid; flex: 0 0 auto; place-items: center; width: 25px; height: 25px; border: 1px solid rgba(85,135,54,.3); border-radius: 8px; background: #fff; transition: .18s ease; }
+.guide-check::after { content: ''; width: 9px; height: 5px; border: solid #fff; border-width: 0 0 2px 2px; transform: translateY(-1px) rotate(-45deg) scale(0); transition: transform .18s ease; }
+.guide-control input:checked + .guide-check { border-color: var(--primary); background: var(--primary); }
+.guide-control input:checked + .guide-check::after { transform: translateY(-1px) rotate(-45deg) scale(1); }
+.guide-control input:focus-visible + .guide-check { outline: 3px solid rgba(85,135,54,.28); outline-offset: 3px; }
+.guide-copy { display: grid; gap: 3px; }
+.guide-copy strong { color: var(--secondary); font-size: 12px; }
+.guide-copy small { color: var(--muted); font-size: 9px; }
+.guide-status { color: var(--primary); font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: .04em; text-transform: uppercase; }
+.puzzle-board.no-guide .puzzle-tile::after { display: none; }
+
+@media (max-width: 620px) {
+  .guide-setting { align-items: flex-start; }
+  .guide-status { padding-top: 6px; text-align: right; }
+}
 .mix-option.active .mix-check { display: block; }
