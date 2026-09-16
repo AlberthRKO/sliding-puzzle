@@ -81,6 +81,10 @@
                   <span class="button-icon" aria-hidden="true">⌾</span>
                   <span><strong>Tomar una foto</strong><small>Usar la cámara del dispositivo</small></span>
                 </button>
+                <button class="action-button secondary-soft library-soft" id="gallery-button" type="button">
+                  <span class="button-icon" aria-hidden="true">▦</span>
+                  <span><strong>Escoger una foto</strong><small>Banco de imágenes de Roma</small></span>
+                </button>
                 <p class="source-tip"><span>✦</span> Para mejores resultados usa una imagen cuadrada y bien iluminada.</p>
               </div>
             </div>
@@ -212,6 +216,19 @@
           <button class="side-new-button" id="side-new-image" type="button"><span aria-hidden="true">＋</span> Elegir otra imagen</button>
         </aside>
       </main>
+    </div>
+
+    <div class="modal-backdrop hidden" id="gallery-modal" role="dialog" aria-modal="true" aria-labelledby="gallery-title">
+      <div class="gallery-dialog">
+        <div class="modal-topline"><span class="section-number">banco de fotos</span><button class="close-button" id="close-gallery" type="button" aria-label="Cerrar banco de fotos">×</button></div>
+        <div class="gallery-heading">
+          <div><h2 id="gallery-title">Escoge una foto</h2><p class="modal-lead">Selecciona una imagen para convertirla en tu puzzle.</p></div>
+          <span class="gallery-count" id="gallery-count">0 fotos</span>
+        </div>
+        <div class="gallery-categories" id="gallery-categories" role="tablist" aria-label="Categorías de imágenes"></div>
+        <div class="gallery-grid" id="gallery-grid" aria-live="polite"></div>
+        <div class="gallery-actions"><button class="secondary-button" id="cancel-gallery" type="button">Cancelar</button><button class="primary-button" id="use-gallery-photo" type="button" disabled>Usar esta foto <span aria-hidden="true">→</span></button></div>
+      </div>
     </div>
 
     <div class="modal-backdrop hidden" id="camera-modal" role="dialog" aria-modal="true" aria-labelledby="camera-title">

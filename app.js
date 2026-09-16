@@ -1,4 +1,48 @@
-const DEFAULT_IMAGE = 'logoRoma.png';
+const DEFAULT_IMAGE = 'img/optimizadas/roma.webp';
+const MAX_IMAGE_SIDE = 1200;
+const CAMERA_MAX_WIDTH = 1280;
+const CAMERA_MAX_HEIGHT = 720;
+const CAMERA_MAX_FPS = 24;
+
+const PHOTO_CATEGORIES = [
+  { id: 'all', label: 'Todas' },
+  { id: 'roma', label: 'Roma' },
+  { id: 'ninos', label: 'Niños' },
+  { id: 'adultos', label: 'Adultos' },
+  { id: 'equipos', label: 'Equipos' },
+  { id: 'paises', label: 'Países' }
+];
+
+const PHOTO_LIBRARY = [
+  { id: 'roma', category: 'roma', title: 'Ecosistema Roma', src: DEFAULT_IMAGE },
+  { id: 'lion', category: 'ninos', title: 'León aventurero', src: 'img/optimizadas/ninos/3d-animated-cartoon-lion.webp' },
+  { id: 'dragon', category: 'ninos', title: 'Dragón curioso', src: 'img/optimizadas/ninos/3d-kid-dragon-hanging-out.webp' },
+  { id: 'tiger', category: 'ninos', title: 'Tigre explorador', src: 'img/optimizadas/ninos/cute-tiger-wearing-clothes.webp' },
+  { id: 'shark', category: 'ninos', title: 'Tiburón fantástico', src: 'img/optimizadas/ninos/fantasy-shark-illustration.webp' },
+  { id: 'car', category: 'ninos', title: 'Auto 3D', src: 'img/optimizadas/ninos/view-3d-graphic-car.webp' },
+  { id: 'penguin', category: 'ninos', title: 'Pingüino futbolista', src: 'img/optimizadas/ninos/view-cartoon-animated-3d-penguin-playing-soccer.webp' },
+  { id: 'helicopter', category: 'ninos', title: 'Helicóptero', src: 'img/optimizadas/ninos/view-graphic-3d-helicopter.webp' },
+  { id: 'tractor', category: 'ninos', title: 'Tractor', src: 'img/optimizadas/ninos/view-graphic-3d-tractor.webp' },
+  { id: 'rainbow', category: 'adultos', title: 'Arcoíris en la naturaleza', src: 'img/optimizadas/adultos/beautiful-rainbow-nature.webp' },
+  { id: 'temple', category: 'adultos', title: 'Bustos griegos', src: 'img/optimizadas/adultos/greek-busts-inside-temple.webp' },
+  { id: 'arsenal', category: 'equipos', title: 'Arsenal', src: 'img/optimizadas/equipos/arsenal.football-logos.cc.webp' },
+  { id: 'barcelona', category: 'equipos', title: 'Barcelona', src: 'img/optimizadas/equipos/barcelona.football-logos.cc.webp' },
+  { id: 'bayern', category: 'equipos', title: 'Bayern Múnich', src: 'img/optimizadas/equipos/bayern-munchen.football-logos.cc.webp' },
+  { id: 'boca', category: 'equipos', title: 'Boca Juniors', src: 'img/optimizadas/equipos/boca-juniors.football-logos.cc.webp' },
+  { id: 'city', category: 'equipos', title: 'Manchester City', src: 'img/optimizadas/equipos/manchester-city.football-logos.cc.webp' },
+  { id: 'united', category: 'equipos', title: 'Manchester United', src: 'img/optimizadas/equipos/manchester-united.football-logos.cc.webp' },
+  { id: 'psg', category: 'equipos', title: 'Paris Saint-Germain', src: 'img/optimizadas/equipos/paris-saint-germain.football-logos.cc.webp' },
+  { id: 'madrid', category: 'equipos', title: 'Real Madrid', src: 'img/optimizadas/equipos/real-madrid.football-logos.cc.webp' },
+  { id: 'river', category: 'equipos', title: 'River Plate', src: 'img/optimizadas/equipos/river-plate.football-logos.cc.webp' },
+  { id: 'argentina', category: 'paises', title: 'Argentina', src: 'img/optimizadas/paises/ar.webp' },
+  { id: 'bolivia', category: 'paises', title: 'Bolivia', src: 'img/optimizadas/paises/bo.webp' },
+  { id: 'brasil', category: 'paises', title: 'Brasil', src: 'img/optimizadas/paises/br.webp' },
+  { id: 'chile', category: 'paises', title: 'Chile', src: 'img/optimizadas/paises/cl.webp' },
+  { id: 'colombia', category: 'paises', title: 'Colombia', src: 'img/optimizadas/paises/co.webp' },
+  { id: 'ecuador', category: 'paises', title: 'Ecuador', src: 'img/optimizadas/paises/ec.webp' },
+  { id: 'peru', category: 'paises', title: 'Perú', src: 'img/optimizadas/paises/pe.webp' },
+  { id: 'uruguay', category: 'paises', title: 'Uruguay', src: 'img/optimizadas/paises/uy.webp' }
+];
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -10,6 +54,8 @@ const state = {
   mode: 'normal',
   difficulty: 'easy',
   showGuide: true,
+  galleryCategory: 'all',
+  gallerySelectionId: 'roma',
   size: 3,
   seconds: 90,
   timeLeft: 90,
@@ -28,6 +74,7 @@ const state = {
   drag: null,
   suppressClick: false,
   imageRequestId: 0,
+  imageObjectUrl: '',
   imageReadyPromise: Promise.resolve(DEFAULT_IMAGE),
   starting: false,
   bestTimes: loadBestTimes()
@@ -46,18 +93,20 @@ function formatTime(totalSeconds) {
   return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`;
 }
 
-function createSquareImage(source) {
+function createSquareCanvas(source) {
   return new Promise((resolve, reject) => {
     const image = new Image();
+    image.decoding = 'async';
     image.onload = () => {
       const side = Math.min(image.naturalWidth, image.naturalHeight);
       if (!side) {
         reject(new Error('La imagen no tiene un tamaño válido.'));
         return;
       }
+      const outputSide = Math.min(side, MAX_IMAGE_SIDE);
       const canvas = document.createElement('canvas');
-      canvas.width = side;
-      canvas.height = side;
+      canvas.width = outputSide;
+      canvas.height = outputSide;
       const context = canvas.getContext('2d');
       if (!context) {
         reject(new Error('El navegador no puede preparar la imagen.'));
@@ -66,33 +115,87 @@ function createSquareImage(source) {
       const sourceX = (image.naturalWidth - side) / 2;
       const sourceY = (image.naturalHeight - side) / 2;
       context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, side, side);
+      context.fillRect(0, 0, outputSide, outputSide);
       context.imageSmoothingEnabled = true;
       context.imageSmoothingQuality = 'high';
-      context.drawImage(image, sourceX, sourceY, side, side, 0, 0, side, side);
-      resolve(canvas.toDataURL('image/jpeg', .95));
+      context.drawImage(image, sourceX, sourceY, side, side, 0, 0, outputSide, outputSide);
+      resolve(canvas);
     };
     image.onerror = () => reject(new Error('No se pudo preparar la imagen.'));
     image.src = source;
   });
 }
 
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error('El navegador no pudo comprimir la imagen.'));
+    }, type, quality);
+  });
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('No se pudo preparar la imagen.'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function createOptimizedImageBlob(source) {
+  const sourceUrl = source instanceof Blob ? URL.createObjectURL(source) : source;
+  try {
+    const canvas = await createSquareCanvas(sourceUrl);
+    try {
+      const webp = await canvasToBlob(canvas, 'image/webp', .82);
+      if (webp.type === 'image/webp') return webp;
+      return canvasToBlob(canvas, 'image/jpeg', .82);
+    } catch {
+      return canvasToBlob(canvas, 'image/jpeg', .82);
+    }
+  } finally {
+    if (source instanceof Blob) URL.revokeObjectURL(sourceUrl);
+  }
+}
+
+function createSquareImage(source) {
+  return createOptimizedImageBlob(source).then(blobToDataUrl);
+}
+
 function setImage(source, name = 'Imagen elegida') {
+  if (state.imageObjectUrl && state.imageObjectUrl !== source) {
+    URL.revokeObjectURL(state.imageObjectUrl);
+    state.imageObjectUrl = '';
+  }
+  if (source.startsWith('blob:')) state.imageObjectUrl = source;
   const requestId = ++state.imageRequestId;
   state.imageSrc = source;
-  state.puzzleImageSrc = source;
   state.imageName = name;
-  $('#image-preview').src = source;
-  $('#reference-image').src = source;
   $('#preview-caption').textContent = name.length > 24 ? `${name.slice(0, 23)}…` : name;
   state.imageReadyPromise = createSquareImage(source).then((squareImage) => {
     if (requestId !== state.imageRequestId) return squareImage;
+    if (state.imageObjectUrl === source) {
+      URL.revokeObjectURL(state.imageObjectUrl);
+      state.imageObjectUrl = '';
+    }
     state.puzzleImageSrc = squareImage;
     $('#image-preview').src = squareImage;
     $('#reference-image').src = squareImage;
     if (state.status === 'playing') refreshTileImages();
     return squareImage;
-  }).catch(() => source);
+  }).catch(() => {
+    if (requestId !== state.imageRequestId) return source;
+    if (state.imageObjectUrl === source) {
+      URL.revokeObjectURL(state.imageObjectUrl);
+      state.imageObjectUrl = '';
+    }
+    state.puzzleImageSrc = source;
+    $('#image-preview').src = source;
+    $('#reference-image').src = source;
+    return source;
+  });
 }
 
 function getTimeForSettings() {
@@ -138,6 +241,92 @@ function setGuide(showGuide) {
   const status = $('#guide-status');
   if (toggle) toggle.checked = state.showGuide;
   if (status) status.textContent = state.showGuide ? 'números visibles' : 'sin números';
+}
+
+function getSelectedGalleryPhoto() {
+  return PHOTO_LIBRARY.find((photo) => photo.id === state.gallerySelectionId) || null;
+}
+
+function renderGalleryCategories() {
+  const categories = $('#gallery-categories');
+  if (!categories) return;
+  categories.innerHTML = '';
+  PHOTO_CATEGORIES.forEach((category) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'gallery-category';
+    button.dataset.category = category.id;
+    button.setAttribute('role', 'tab');
+    button.setAttribute('aria-selected', String(state.galleryCategory === category.id));
+    button.textContent = category.label;
+    button.addEventListener('click', () => {
+      state.galleryCategory = category.id;
+      renderGalleryCategories();
+      renderGalleryGrid();
+    });
+    categories.appendChild(button);
+  });
+}
+
+function renderGalleryGrid() {
+  const grid = $('#gallery-grid');
+  const count = $('#gallery-count');
+  const useButton = $('#use-gallery-photo');
+  if (!grid || !count || !useButton) return;
+  const photos = state.galleryCategory === 'all'
+    ? PHOTO_LIBRARY
+    : PHOTO_LIBRARY.filter((photo) => photo.category === state.galleryCategory);
+  count.textContent = `${photos.length} ${photos.length === 1 ? 'foto' : 'fotos'}`;
+  grid.innerHTML = '';
+  photos.forEach((photo) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'gallery-card';
+    card.dataset.photoId = photo.id;
+    card.setAttribute('aria-pressed', String(state.gallerySelectionId === photo.id));
+    card.classList.toggle('selected', state.gallerySelectionId === photo.id);
+    const imageWrap = document.createElement('span');
+    imageWrap.className = 'gallery-card-image';
+    const image = document.createElement('img');
+    image.src = photo.src;
+    image.alt = photo.title;
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    const check = document.createElement('span');
+    check.className = 'gallery-card-check';
+    check.setAttribute('aria-hidden', 'true');
+    check.textContent = '✓';
+    imageWrap.append(image, check);
+    const label = document.createElement('span');
+    label.className = 'gallery-card-label';
+    label.textContent = photo.title;
+    card.append(imageWrap, label);
+    card.addEventListener('click', () => {
+      state.gallerySelectionId = photo.id;
+      renderGalleryGrid();
+    });
+    grid.appendChild(card);
+  });
+  useButton.disabled = !photos.some((photo) => photo.id === state.gallerySelectionId);
+}
+
+function openGallery() {
+  state.galleryCategory = 'all';
+  state.gallerySelectionId = PHOTO_LIBRARY.find((photo) => photo.src === state.imageSrc)?.id || '';
+  renderGalleryCategories();
+  renderGalleryGrid();
+  $('#gallery-modal').classList.remove('hidden');
+}
+
+function closeGallery() {
+  $('#gallery-modal').classList.add('hidden');
+}
+
+function useGalleryPhoto() {
+  const photo = getSelectedGalleryPhoto();
+  if (!photo) return;
+  setImage(photo.src, photo.title);
+  closeGallery();
 }
 
 function getNeighbors(index) {
@@ -578,6 +767,9 @@ function shouldMirrorCamera() {
   const label = (activeDevice?.label || '').toLowerCase();
   const isBackCamera = /back|rear|environment|trasera|posterior/.test(label);
   const isMirroredCamera = /front|user|frontal|selfie|usb|webcam|external|externa|pc camera|logitech|integrated|built[- ]?in|facetime|hd camera/.test(label);
+
+  // Algunas webcams entregan el video espejado aunque no informen facingMode.
+  // Las cámaras traseras siempre deben conservar su orientación natural.
   if (isBackCamera) return false;
   if (isMirroredCamera) return true;
   return state.cameraFacingMode === 'user' || state.cameraFacingMode === 'unknown';
@@ -625,9 +817,9 @@ async function refreshCameraDevices() {
 
 function getCameraConstraints(cameraId = '') {
   const video = {
-    width: { ideal: 1920 },
-    height: { ideal: 1080 },
-    frameRate: { ideal: 30 }
+    width: { ideal: CAMERA_MAX_WIDTH, max: CAMERA_MAX_WIDTH },
+    height: { ideal: CAMERA_MAX_HEIGHT, max: CAMERA_MAX_HEIGHT },
+    frameRate: { ideal: CAMERA_MAX_FPS, max: CAMERA_MAX_FPS }
   };
   if (cameraId) video.deviceId = { exact: cameraId };
   else if (state.cameraFacingMode === 'user' || state.cameraFacingMode === 'environment') {
@@ -643,7 +835,11 @@ async function requestCameraStream(cameraId = '') {
     // Si el celular no expone el modo preferido, probamos cualquier cámara disponible.
     if (!cameraId && error.name === 'OverconstrainedError') {
       return navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
+        video: {
+          width: { ideal: 960, max: CAMERA_MAX_WIDTH },
+          height: { ideal: 540, max: CAMERA_MAX_HEIGHT },
+          frameRate: { ideal: 20, max: CAMERA_MAX_FPS }
+        },
         audio: false
       });
     }
@@ -654,12 +850,12 @@ async function requestCameraStream(cameraId = '') {
 async function prepareCameraTrack(track) {
   try {
     const capabilities = track.getCapabilities?.() || {};
-    const maxWidth = capabilities.width?.max || 1920;
-    const maxHeight = capabilities.height?.max || 1080;
+    const maxWidth = Math.min(capabilities.width?.max || CAMERA_MAX_WIDTH, CAMERA_MAX_WIDTH);
+    const maxHeight = Math.min(capabilities.height?.max || CAMERA_MAX_HEIGHT, CAMERA_MAX_HEIGHT);
     await track.applyConstraints({
-      width: { ideal: Math.min(maxWidth, 1920), max: maxWidth },
-      height: { ideal: Math.min(maxHeight, 1080), max: maxHeight },
-      frameRate: { ideal: 30 }
+      width: { ideal: maxWidth, max: maxWidth },
+      height: { ideal: maxHeight, max: maxHeight },
+      frameRate: { ideal: CAMERA_MAX_FPS, max: CAMERA_MAX_FPS }
     });
   } catch {
     // Algunas cámaras USB o WebView solo aceptan su resolución predeterminada.
@@ -667,11 +863,11 @@ async function prepareCameraTrack(track) {
 }
 
 async function startCameraStream(cameraId = '') {
+  // Al cambiar de cámara no mantenemos dos streams vivos al mismo tiempo.
+  stopCamera();
   const stream = await requestCameraStream(cameraId);
-  const oldStream = state.cameraStream;
   const track = stream.getVideoTracks()[0];
   await prepareCameraTrack(track);
-  oldStream?.getTracks().forEach((oldTrack) => oldTrack.stop());
   state.cameraStream = stream;
   state.activeCameraId = track.getSettings?.().deviceId || cameraId || '';
   const detectedFacingMode = track.getSettings?.().facingMode;
@@ -766,7 +962,7 @@ function capturePhoto() {
   const sourceSide = Math.min(video.videoWidth, video.videoHeight);
   const sourceX = (video.videoWidth - sourceSide) / 2;
   const sourceY = (video.videoHeight - sourceSide) / 2;
-  const scale = Math.min(1, 1920 / sourceSide);
+  const scale = Math.min(1, MAX_IMAGE_SIDE / sourceSide);
   canvas.width = Math.round(sourceSide * scale);
   canvas.height = Math.round(sourceSide * scale);
   const context = canvas.getContext('2d');
@@ -782,7 +978,8 @@ function capturePhoto() {
   } else {
     context.drawImage(video, sourceX, sourceY, sourceSide, sourceSide, 0, 0, canvas.width, canvas.height);
   }
-  state.capturedData = canvas.toDataURL('image/jpeg', .9);
+  const webpPhoto = canvas.toDataURL('image/webp', .82);
+  state.capturedData = webpPhoto.startsWith('data:image/webp') ? webpPhoto : canvas.toDataURL('image/jpeg', .82);
   $('#captured-image').src = state.capturedData;
   pauseCameraPreview();
   $('#camera-live').classList.add('hidden');
@@ -799,17 +996,18 @@ setGuide(true);
 $$('.mode-option').forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
 $$('.mix-option').forEach((button) => button.addEventListener('click', () => setDifficulty(button.dataset.difficulty)));
 $('#guide-toggle').addEventListener('change', (event) => setGuide(event.currentTarget.checked));
+$('#gallery-button').addEventListener('click', openGallery);
+$('#close-gallery').addEventListener('click', closeGallery);
+$('#cancel-gallery').addEventListener('click', closeGallery);
+$('#use-gallery-photo').addEventListener('click', useGalleryPhoto);
 $('#start-button').addEventListener('click', async (event) => {
   if (state.status !== 'setup' || state.starting) return;
   const startButton = event.currentTarget;
   state.starting = true;
   startButton.disabled = true;
   try {
-    // La partida no queda bloqueada si el navegador tarda en resolver una imagen local.
-    await Promise.race([
-      state.imageReadyPromise,
-      new Promise((resolve) => window.setTimeout(resolve, 400))
-    ]);
+    // Esperamos el recorte optimizado para no iniciar el tablero con la imagen original pesada.
+    await state.imageReadyPromise;
     startGame();
   } finally {
     state.starting = false;
@@ -825,9 +1023,8 @@ $('#play-again').addEventListener('click', startGame);
 $('#file-input').addEventListener('change', (event) => {
   const [file] = event.target.files;
   if (!file) return;
-  const reader = new FileReader();
-  reader.addEventListener('load', () => setImage(reader.result, file.name));
-  reader.readAsDataURL(file);
+  // El object URL evita duplicar una foto grande en memoria como Data URL.
+  setImage(URL.createObjectURL(file), file.name);
   event.target.value = '';
 });
 
@@ -847,7 +1044,8 @@ window.addEventListener('pagehide', stopCamera);
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
-    if (!$('#camera-modal').classList.contains('hidden')) closeCamera();
+    if (!$('#gallery-modal').classList.contains('hidden')) closeGallery();
+    else if (!$('#camera-modal').classList.contains('hidden')) closeCamera();
     else if (!$('#result-modal').classList.contains('hidden')) $('#result-modal').classList.add('hidden');
   }
 });
