@@ -54,7 +54,7 @@ const state = {
   mode: 'normal',
   difficulty: 'easy',
   showGuide: true,
-  galleryCategory: 'all',
+  galleryCategory: 'ninos',
   gallerySelectionId: 'roma',
   size: 3,
   seconds: 90,
@@ -182,7 +182,10 @@ function setImage(source, name = 'Imagen elegida') {
     }
     state.puzzleImageSrc = squareImage;
     $('#image-preview').src = squareImage;
-    $('#reference-image').src = squareImage;
+    ['#reference-image-mobile', '#reference-image-desktop'].forEach((selector) => {
+      const referenceImage = $(selector);
+      if (referenceImage) referenceImage.src = squareImage;
+    });
     if (state.status === 'playing') refreshTileImages();
     return squareImage;
   }).catch(() => {
@@ -193,7 +196,10 @@ function setImage(source, name = 'Imagen elegida') {
     }
     state.puzzleImageSrc = source;
     $('#image-preview').src = source;
-    $('#reference-image').src = source;
+    ['#reference-image-mobile', '#reference-image-desktop'].forEach((selector) => {
+      const referenceImage = $(selector);
+      if (referenceImage) referenceImage.src = source;
+    });
     return source;
   });
 }
@@ -208,6 +214,14 @@ function getTimeForSettings() {
 
 function getBestKey() {
   return `${state.mode}-${state.difficulty}`;
+}
+
+function updateBestTimeUI(value) {
+  const formatted = value ? formatTime(value) : '—';
+  ['#best-time', '#best-time-top'].forEach((selector) => {
+    const element = $(selector);
+    if (element) element.textContent = formatted;
+  });
 }
 
 function setMode(mode) {
@@ -311,8 +325,10 @@ function renderGalleryGrid() {
 }
 
 function openGallery() {
-  state.galleryCategory = 'all';
-  state.gallerySelectionId = PHOTO_LIBRARY.find((photo) => photo.src === state.imageSrc)?.id || '';
+  state.galleryCategory = 'ninos';
+  const currentPhoto = PHOTO_LIBRARY.find((photo) => photo.src === state.imageSrc);
+  const firstChildPhoto = PHOTO_LIBRARY.find((photo) => photo.category === 'ninos');
+  state.gallerySelectionId = currentPhoto?.category === 'ninos' ? currentPhoto.id : firstChildPhoto?.id || '';
   renderGalleryCategories();
   renderGalleryGrid();
   $('#gallery-modal').classList.remove('hidden');
@@ -665,7 +681,7 @@ function startGame() {
   const difficultyLabel = { easy: 'Fácil', normal: 'Normal', hard: 'Difícil' }[state.difficulty];
   $('#game-mode-title').textContent = `${modeLabel} · ${difficultyLabel}`;
   $('#goal-text').textContent = `Ordena las ${state.size * state.size} casillas para revelar la foto completa.`;
-  $('#best-time').textContent = state.bestTimes[getBestKey()] ? formatTime(state.bestTimes[getBestKey()]) : '—';
+  updateBestTimeUI(state.bestTimes[getBestKey()]);
   $('#setup-screen').classList.add('hidden');
   document.querySelector('.app-shell').classList.add('game-active');
   $('#game-screen').classList.remove('hidden');
@@ -698,7 +714,7 @@ function finishGame(won) {
     if (!best || elapsed < best) {
       state.bestTimes[getBestKey()] = elapsed;
       saveBestTimes();
-      $('#best-time').textContent = formatTime(elapsed);
+      updateBestTimeUI(elapsed);
     }
   } else {
     resultKicker.textContent = 'se acabó el tiempo';

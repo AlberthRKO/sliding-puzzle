@@ -88,6 +88,10 @@
                 <p class="source-tip"><span>✦</span> Para mejores resultados usa una imagen cuadrada y bien iluminada.</p>
               </div>
             </div>
+            <div class="setup-footer">
+              <div class="ready-message"><span class="ready-check">✓</span><span><strong>Todo listo</strong><small>Tu puzzle se mezclará al empezar.</small></span></div>
+              <button class="start-button" id="start-button" type="button"><span>Iniciar juego</span><b aria-hidden="true">→</b></button>
+            </div>
           </article>
 
           <aside class="panel instructions-card">
@@ -164,10 +168,6 @@
             <span class="guide-status" id="guide-status">números visibles</span>
           </div>
 
-          <div class="setup-footer">
-            <div class="ready-message"><span class="ready-check">✓</span><span><strong>Todo listo</strong><small>Tu puzzle se mezclará al empezar.</small></span></div>
-            <button class="start-button" id="start-button" type="button"><span>Iniciar juego</span><b aria-hidden="true">→</b></button>
-          </div>
         </section>
       </main>
 
@@ -183,10 +183,15 @@
 
       <main class="game-layout">
         <section class="board-zone">
-          <div class="game-stats">
-            <div class="live-stat timer-stat"><span class="stat-label">tiempo restante</span><strong id="timer">01:00</strong><span class="timer-track"><i id="timer-bar"></i></span></div>
-            <div class="live-stat"><span class="stat-label">movimientos</span><strong id="move-count">0</strong><span class="stat-sub">pasos dados</span></div>
-            <div class="live-stat"><span class="stat-label">mejor tiempo</span><strong id="best-time">—</strong><span class="stat-sub">en este tótem</span></div>
+          <div class="game-overview">
+            <div class="side-card reference-card mobile-reference">
+              <div class="reference-image-wrap"><img id="reference-image-mobile" alt="Imagen de referencia completa" /><span>referencia</span></div>
+            </div>
+            <div class="game-stats">
+              <div class="live-stat timer-stat"><span class="stat-label">tiempo restante</span><strong id="timer">01:00</strong><span class="timer-track"><i id="timer-bar"></i></span></div>
+              <div class="live-stat"><span class="stat-label">movimientos</span><strong id="move-count">0</strong><span class="stat-sub">pasos dados</span></div>
+              <div class="live-stat desktop-best-stat"><span class="stat-label">mejor tiempo</span><strong id="best-time-top">—</strong><span class="stat-sub">en este tótem</span></div>
+            </div>
           </div>
 
           <div class="board-wrap">
@@ -203,15 +208,20 @@
 
         <aside class="game-sidebar">
           <div class="side-card mission-card">
-            <p class="section-number">tu misión</p>
-            <h2>Completa<br /><em>la imagen.</em></h2>
+            <div class="mission-heading-row">
+              <div>
+                <p class="section-number">tu misión</p>
+                <h2>Completa<br /><em>la imagen.</em></h2>
+              </div>
+              <div class="mission-best"><span>mejor tiempo</span><strong id="best-time">—</strong><small>en este tótem</small></div>
+            </div>
             <p id="goal-text">Ordena las 9 piezas para revelar la foto completa.</p>
             <div class="progress-meta"><span>progreso</span><strong id="progress-text">0%</strong></div>
             <div class="progress-track"><i id="progress-bar"></i></div>
             <div class="side-card-row"><span>piezas bien ubicadas</span><strong id="correct-count">0 / 8</strong></div>
           </div>
-          <div class="side-card reference-card">
-            <div class="reference-image-wrap"><img id="reference-image" alt="Imagen de referencia completa" /><span>referencia</span></div>
+          <div class="side-card reference-card desktop-reference">
+            <div class="reference-image-wrap"><img id="reference-image-desktop" alt="Imagen de referencia completa" /><span>referencia</span></div>
           </div>
           <button class="side-new-button" id="side-new-image" type="button"><span aria-hidden="true">＋</span> Elegir otra imagen</button>
         </aside>
