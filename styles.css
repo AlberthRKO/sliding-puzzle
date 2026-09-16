@@ -107,7 +107,7 @@ img { display: block; max-width: 100%; }
 
 .modal-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(4,9,23,.78); backdrop-filter: blur(10px); }.camera-dialog, .result-dialog { position: relative; width: min(100%, 480px); max-height: calc(100vh - 40px); overflow: auto; padding: 27px; border-radius: 25px; background: linear-gradient(145deg, #1b2a50, #101b38); border: 1px solid rgba(141,255,208,.25); box-shadow: 0 35px 100px rgba(0,0,0,.4); }.modal-topline { display: flex; justify-content: space-between; align-items: center; }.close-button { width: 31px; height: 31px; border-radius: 50%; color: var(--muted-light); background: rgba(255,255,255,.07); font-size: 22px; line-height: 1; }.camera-dialog h2, .result-dialog h2 { margin: 11px 0 6px; font-size: 31px; letter-spacing: -.06em; }.modal-lead, #result-message { color: var(--muted-light); font-size: 12px; line-height: 1.55; margin: 0; }.camera-stage { position: relative; overflow: hidden; margin: 21px 0 15px; aspect-ratio: 4 / 3; border-radius: 16px; background: #091127; border: 1px solid rgba(141,255,208,.22); }.camera-live, .camera-review { position: absolute; inset: 0; }.camera-live video, .camera-review img { width: 100%; height: 100%; object-fit: cover; }.camera-frame-corner { position: absolute; inset: 18%; border: 1px solid rgba(141,255,208,.75); border-radius: 12px; box-shadow: 0 0 0 999px rgba(8,16,35,.18); pointer-events: none; }.camera-status { position: absolute; bottom: 11px; left: 50%; transform: translateX(-50%); color: white; background: rgba(8,16,35,.67); padding: 7px 9px; border-radius: 6px; white-space: nowrap; font-size: 7px; letter-spacing: .03em; text-transform: none; }.camera-actions, .result-actions { display: flex; gap: 9px; }.camera-actions > button, .result-actions > button { flex: 1; }.primary-button, .secondary-button { min-height: 45px; padding: 12px 15px; border-radius: 11px; font-size: 11px; }.secondary-button { color: var(--muted-light); background: rgba(255,255,255,.06); border: 1px solid var(--line); }.result-dialog { text-align: center; overflow: hidden; padding: 40px 30px 29px; }.result-dialog h2 { font-size: 49px; color: var(--aqua); margin-top: 8px; }.result-dialog #result-message { max-width: 300px; margin: 0 auto; }.result-icon { position: relative; z-index: 1; display: grid; place-items: center; width: 68px; height: 68px; margin: 0 auto; border-radius: 24px; color: var(--ink); background: var(--yellow); font-size: 34px; transform: rotate(-7deg); box-shadow: 0 0 0 8px rgba(255,201,106,.11); }.result-time { display: grid; gap: 4px; width: max-content; margin: 22px auto; padding: 11px 21px; border-radius: 12px; background: rgba(255,255,255,.06); }.result-time small { color: var(--muted); font-size: 8px; }.result-time strong { font-size: 25px; letter-spacing: -.07em; }.result-actions { position: relative; z-index: 1; flex-direction: column; }.orbit-one, .orbit-two { position: absolute; border: 1px solid rgba(141,255,208,.18); border-radius: 50%; pointer-events: none; }.orbit-one { width: 300px; height: 300px; left: -170px; bottom: -170px; }.orbit-two { width: 210px; height: 210px; right: -130px; top: -120px; border-color: rgba(255,201,106,.2); }
 
-@media (max-width: 900px) {
+@media (max-width: 991px) {
   .setup-screen { padding-top: 35px; }
   .hero { grid-template-columns: 1fr .8fr; gap: 18px; }.hero h1 { font-size: clamp(40px, 6vw, 62px); }.mini-puzzle { transform: scale(.83) rotate(6deg); }.label-top { right: 0; }.label-bottom { left: 0; }
   .setup-grid { grid-template-columns: 1fr; }.image-source-layout { grid-template-columns: minmax(220px, .7fr) 1fr; }
@@ -421,11 +421,11 @@ img { display: block; max-width: 100%; }
   margin: 0;
 }
 .game-overview .reference-card {
-  width: min(100%, 292px);
+  width: min(100%, 208px);
   justify-self: center;
   padding: 9px;
 }
-.game-overview .reference-image-wrap { width: min(100%, 260px); }
+.game-overview .reference-image-wrap { width: min(100%, 190px); }
 
 .mission-best {
   display: grid;
@@ -459,7 +459,7 @@ img { display: block; max-width: 100%; }
 .desktop-best-stat { display: none; }
 .desktop-reference { display: none; }
 
-@media (max-width: 900px) {
+@media (max-width: 991px) {
   .game-layout {
     display: block;
   }
@@ -502,6 +502,7 @@ img { display: block; max-width: 100%; }
     gap: 8px;
   }
   .game-overview .reference-image-wrap { width: min(100%, 170px); }
+  .game-overview .reference-card { width: min(100%, 188px); }
   .mission-heading-row { gap: 8px; }
   .mission-best { min-width: 96px; padding-inline: 9px; }
   .image-card .setup-footer {
@@ -509,17 +510,35 @@ img { display: block; max-width: 100%; }
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+    flex-wrap: wrap;
   }
-  .image-card .ready-message { min-width: 0; flex: 1 1 auto; }
+  .image-card .ready-message {
+    min-width: 145px;
+    flex: 1 1 145px;
+  }
   .image-card .start-button {
     width: auto;
-    flex: 0 0 auto;
+    min-width: 140px;
+    flex: 1 1 140px;
     padding-inline: 13px;
   }
 }
 
-/* Desde 769 px se recupera la composición amplia anterior. */
-@media (min-width: 769px) {
+/* En celulares muy angostos la confirmación y el botón se apilan para conservar legibilidad. */
+@media (max-width: 360px) {
+  .image-card .setup-footer {
+    display: grid;
+    gap: 12px;
+  }
+  .image-card .ready-message,
+  .image-card .start-button {
+    width: 100%;
+  }
+  .image-card .start-button { justify-content: space-between; }
+}
+
+/* Desde 992 px se recupera la composición amplia anterior. */
+@media (min-width: 992px) {
   .game-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
@@ -540,6 +559,7 @@ img { display: block; max-width: 100%; }
   .mission-best { display: none; }
   .desktop-reference { width: 100%; padding: 14px; }
   .desktop-reference .reference-image-wrap { width: min(100%, 190px); }
+  .board-wrap, .game-helper { width: min(66vw, 66vh, 100%, 620px); }
 }
 
 .mix-option.active .mix-check { display: block; }
