@@ -67,7 +67,7 @@
       .preview-panel h2 span { color: var(--primary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 8px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; }
       .preview-box { display: grid; place-items: center; width: 100%; aspect-ratio: 1; overflow: hidden; background: #f1f4ef; border: 1px solid rgba(85, 135, 54, .2); border-radius: 15px; }
       .preview-box img { width: 100%; height: 100%; object-fit: contain; }
-      .preview-box img.square { object-fit: cover; }
+      .preview-box img.square { object-fit: contain; background: #f2f4f0; }
       .empty-message { padding: 20px; color: #9aa197; font-size: 11px; text-align: center; }
       .preview-meta { min-height: 17px; margin: 8px 0 0; color: var(--muted); font-size: 9px; }
 
@@ -115,7 +115,7 @@
     <main class="converter-shell">
       <p class="eyebrow">Preparación para el banco</p>
       <h1>Convierte y <em>optimiza.</em></h1>
-      <p class="lead">Recorta tu imagen al formato cuadrado que utiliza el puzzle, reduce su peso y descarga el original junto con la versión WebP optimizada.</p>
+      <p class="lead">Ajusta tu imagen completa dentro del formato cuadrado que utiliza el puzzle, reduce su peso y descarga el original junto con la versión WebP optimizada.</p>
 
       <section class="converter-card" aria-labelledby="converter-title">
         <h2 id="converter-title" class="hidden">Convertidor de imágenes</h2>
@@ -133,7 +133,7 @@
               <option value="800" selected>800 × 800 px · recomendado para tótem</option>
               <option value="1024">1024 × 1024 px</option>
             </select>
-            <p class="control-note">El recorte mantiene el centro y nunca estira la imagen.</p>
+            <p class="control-note">La imagen completa se centra y se agregan espacios transparentes; nunca se estira.</p>
           </div>
           <div class="field">
             <label for="quality">Calidad WebP</label>
@@ -235,8 +235,8 @@
       async function optimize(file, currentProcessId) {
         const image = await loadImage(originalUrl);
         if (currentProcessId !== processId) return;
-        const side = Math.min(image.naturalWidth, image.naturalHeight);
-        const outputSide = Math.min(side, Number(maxSize.value));
+        const longestSide = Math.max(image.naturalWidth, image.naturalHeight);
+        const outputSide = Math.min(longestSide, Number(maxSize.value));
         if (!outputSide) throw new Error('La imagen no tiene un tamaño válido.');
 
         const canvas = document.createElement('canvas');
@@ -244,17 +244,23 @@
         canvas.height = outputSide;
         const context = canvas.getContext('2d');
         if (!context) throw new Error('El navegador no pudo preparar el canvas.');
-        const sourceX = (image.naturalWidth - side) / 2;
-        const sourceY = (image.naturalHeight - side) / 2;
-        context.fillStyle = '#ffffff';
-        context.fillRect(0, 0, outputSide, outputSide);
+        const scale = Math.min(outputSide / image.naturalWidth, outputSide / image.naturalHeight);
+        const drawWidth = Math.round(image.naturalWidth * scale);
+        const drawHeight = Math.round(image.naturalHeight * scale);
+        const drawX = Math.round((outputSide - drawWidth) / 2);
+        const drawY = Math.round((outputSide - drawHeight) / 2);
+        context.clearRect(0, 0, outputSide, outputSide);
         context.imageSmoothingEnabled = true;
         context.imageSmoothingQuality = 'high';
-        context.drawImage(image, sourceX, sourceY, side, side, 0, 0, outputSide, outputSide);
+        context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, drawX, drawY, drawWidth, drawHeight);
 
         let result = await canvasToBlob(canvas, 'image/webp', Number(quality.value) / 100);
         let extension = 'webp';
         if (result.type !== 'image/webp') {
+          context.globalCompositeOperation = 'destination-over';
+          context.fillStyle = '#ffffff';
+          context.fillRect(0, 0, outputSide, outputSide);
+          context.globalCompositeOperation = 'source-over';
           result = await canvasToBlob(canvas, 'image/jpeg', Number(quality.value) / 100);
           extension = 'jpg';
         }
@@ -267,7 +273,7 @@
         optimizedMeta.textContent = `${outputSide} × ${outputSide} px · ${formatBytes(result.size)}`;
         downloadOptimized.disabled = false;
         downloadOptimized.dataset.extension = extension;
-        setStatus(`Listo. La versión optimizada pesa ${formatBytes(result.size)} y mantiene el recorte cuadrado.`, 'success');
+        setStatus(`Listo. La versión optimizada pesa ${formatBytes(result.size)} y conserva la imagen completa en formato cuadrado.`, 'success');
       }
 
       async function processFile(file) {

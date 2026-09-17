@@ -35,14 +35,15 @@ Cada objeto debe tener:
 }
 ```
 
-Categorías actuales: `ninos`, `adultos`, `equipos` y `paises`. La categoría `roma` se reserva para la imagen institucional por defecto.
+Categorías actuales: `ninos`, `adultos`, `equipos`, `paises`, `infantil` y `simpsons`. La categoría `roma` se reserva para la imagen institucional por defecto.
 
-La carpeta optimizada usa `ninos` sin tilde para evitar problemas de rutas y normalización de caracteres. Las imágenes originales existentes están en sus carpetas de categoría dentro de `img/`.
+Las carpetas optimizadas usan nombres simples (`ninos`, `infantil`, `simpsons`) para evitar problemas de rutas y normalización de caracteres. Las imágenes originales existentes están en sus carpetas de categoría dentro de `img/`.
 
 ## Reglas de imágenes
 
 - Preferir imágenes cuadradas `1:1`.
 - Para el banco del juego, preferir imágenes cuadradas de máximo `800 × 800 px`, especialmente por el tótem de 2 GB de RAM.
+- Las imágenes rectangulares deben ajustarse completas dentro de un lienzo cuadrado `1:1`, con espacios transparentes cuando sea necesario; nunca se deben estirar ni recortar para formar el tablero.
 - Usar WebP con calidad aproximada de `82%`.
 - Conservar una copia original fuera de `img/optimizadas/`.
 - No agregar imágenes pesadas directamente al catálogo.
@@ -51,7 +52,7 @@ La carpeta optimizada usa `ninos` sin tilde para evitar problemas de rutas y nor
 
 ## Herramienta de conversión
 
-`convertir-imagen.html` permite seleccionar JPG, PNG o WebP, recortar al centro en formato cuadrado, elegir tamaño máximo y calidad WebP, y descargar el original y la versión optimizada.
+`convertir-imagen.html` permite seleccionar JPG, PNG o WebP, conservar la imagen completa dentro de un lienzo cuadrado, elegir tamaño máximo y calidad WebP, y descargar el original y la versión optimizada.
 
 La herramienta trabaja solo durante la sesión actual. No usa IndexedDB, localStorage ni servidor y no agrega imágenes automáticamente al banco.
 
@@ -65,7 +66,7 @@ La herramienta trabaja solo durante la sesión actual. No usa IndexedDB, localSt
 - Guía opcional con números sobre las piezas.
 - Movimiento con click/tap, arrastre y desplazamiento de filas o columnas alineadas con el hueco.
 - Las piezas encajan rectas; solo las esquinas exteriores tienen radio.
-- Preview, referencia y puzzle utilizan el mismo recorte cuadrado.
+- Preview, referencia y puzzle utilizan el mismo lienzo cuadrado sin deformar la imagen.
 - Modal de resultado con referencia y tablero final.
 - Reintentar con la misma imagen y cambiar de imagen.
 

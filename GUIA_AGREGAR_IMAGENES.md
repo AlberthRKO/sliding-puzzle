@@ -4,7 +4,7 @@
 
 Abre `convertir-imagen.html` con Live Server y selecciona la imagen.
 
-- Usa recorte cuadrado `1:1`.
+- Usa ajuste cuadrado `1:1` sin recortar la imagen; el convertidor agregará espacios transparentes si hacen falta.
 - Tamaño recomendado: `800 × 800 px` para mantener bajo el consumo de memoria del tótem.
 - Calidad WebP: `80%–85%`.
 - Descarga el original y la versión optimizada.
@@ -20,6 +20,8 @@ img/niños/
 img/adultos/
 img/equipos/
 img/paises/
+img/Infantil/
+img/Los Simpsons/
 ```
 
 Copia el WebP en la carpeta optimizada correspondiente:
@@ -29,6 +31,8 @@ img/optimizadas/ninos/
 img/optimizadas/adultos/
 img/optimizadas/equipos/
 img/optimizadas/paises/
+img/optimizadas/infantil/
+img/optimizadas/simpsons/
 ```
 
 Usa nombres simples, por ejemplo: `perrito-aventurero.webp`.
@@ -53,3 +57,5 @@ El `id` debe ser único. Si creas una categoría nueva, también debes agregarla
 Abre el juego con Live Server, entra en `Escoger una foto` y revisa la categoría. Si no aparece, verifica la ruta, el nombre del archivo y la consola del navegador.
 
 Las imágenes agregadas desde el convertidor no se guardan automáticamente en el banco: siempre hay que copiarlas y registrar su objeto en `PHOTO_LIBRARY`.
+
+Las imágenes de `img/Infantil/` y `img/Los Simpsons/` se publican en `img/optimizadas/infantil/` y `img/optimizadas/simpsons/`. Deben conservar el lienzo cuadrado `1:1` sin deformar el contenido.

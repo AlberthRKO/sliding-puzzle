@@ -10,7 +10,9 @@ const PHOTO_CATEGORIES = [
   { id: 'ninos', label: 'Niños' },
   { id: 'adultos', label: 'Adultos' },
   { id: 'equipos', label: 'Equipos' },
-  { id: 'paises', label: 'Países' }
+  { id: 'paises', label: 'Países' },
+  { id: 'infantil', label: 'Infantil' },
+  { id: 'simpsons', label: 'Los Simpsons' }
 ];
 
 const PHOTO_LIBRARY = [
@@ -41,7 +43,57 @@ const PHOTO_LIBRARY = [
   { id: 'colombia', category: 'paises', title: 'Colombia', src: 'img/optimizadas/paises/co.webp' },
   { id: 'ecuador', category: 'paises', title: 'Ecuador', src: 'img/optimizadas/paises/ec.webp' },
   { id: 'peru', category: 'paises', title: 'Perú', src: 'img/optimizadas/paises/pe.webp' },
-  { id: 'uruguay', category: 'paises', title: 'Uruguay', src: 'img/optimizadas/paises/uy.webp' }
+  { id: 'uruguay', category: 'paises', title: 'Uruguay', src: 'img/optimizadas/paises/uy.webp' },
+  { id: 'infantil-3109', category: 'infantil', title: 'Infantil · 3109', src: 'img/optimizadas/infantil/3109.webp' },
+  { id: 'infantil-alb', category: 'infantil', title: 'Infantil · alb', src: 'img/optimizadas/infantil/alb.webp' },
+  { id: 'infantil-araania', category: 'infantil', title: 'Infantil · araania', src: 'img/optimizadas/infantil/araania.webp' },
+  { id: 'infantil-asd', category: 'infantil', title: 'Infantil · aSD', src: 'img/optimizadas/infantil/aSD.webp' },
+  { id: 'infantil-fast', category: 'infantil', title: 'Infantil · fast', src: 'img/optimizadas/infantil/fast.webp' },
+  { id: 'infantil-futorad', category: 'infantil', title: 'Infantil · futorad', src: 'img/optimizadas/infantil/futorad.webp' },
+  { id: 'infantil-mago', category: 'infantil', title: 'Infantil · mago', src: 'img/optimizadas/infantil/mago.webp' },
+  { id: 'infantil-mario', category: 'infantil', title: 'Infantil · mario', src: 'img/optimizadas/infantil/mario.webp' },
+  { id: 'infantil-mike', category: 'infantil', title: 'Infantil · mike', src: 'img/optimizadas/infantil/mike.webp' },
+  { id: 'infantil-nose', category: 'infantil', title: 'Infantil · nose', src: 'img/optimizadas/infantil/nose.webp' },
+  { id: 'infantil-panda', category: 'infantil', title: 'Infantil · panda', src: 'img/optimizadas/infantil/panda.webp' },
+  { id: 'infantil-patod', category: 'infantil', title: 'Infantil · patod', src: 'img/optimizadas/infantil/patod.webp' },
+  { id: 'infantil-pinocho', category: 'infantil', title: 'Infantil · pinocho', src: 'img/optimizadas/infantil/pinocho.webp' },
+  { id: 'infantil-pluto', category: 'infantil', title: 'Infantil · pluto', src: 'img/optimizadas/infantil/pluto.webp' },
+  { id: 'infantil-pokemon', category: 'infantil', title: 'Infantil · pokemon', src: 'img/optimizadas/infantil/pokemon.webp' },
+  { id: 'infantil-rapu', category: 'infantil', title: 'Infantil · rapu', src: 'img/optimizadas/infantil/rapu.webp' },
+  { id: 'infantil-rio', category: 'infantil', title: 'Infantil · rio', src: 'img/optimizadas/infantil/rio.webp' },
+  { id: 'infantil-ruta', category: 'infantil', title: 'Infantil · ruta', src: 'img/optimizadas/infantil/ruta.webp' },
+  { id: 'infantil-shue', category: 'infantil', title: 'Infantil · shue', src: 'img/optimizadas/infantil/shue.webp' },
+  { id: 'infantil-upse', category: 'infantil', title: 'Infantil · upse', src: 'img/optimizadas/infantil/upse.webp' },
+  { id: 'infantil-yepto', category: 'infantil', title: 'Infantil · yepto', src: 'img/optimizadas/infantil/yepto.webp' },
+  { id: 'simpsons-abolivia', category: 'simpsons', title: 'Los Simpsons · abolivia', src: 'img/optimizadas/simpsons/abolivia.webp' },
+  { id: 'simpsons-abueli', category: 'simpsons', title: 'Los Simpsons · abueli', src: 'img/optimizadas/simpsons/abueli.webp' },
+  { id: 'simpsons-abuemlo', category: 'simpsons', title: 'Los Simpsons · abuemlo', src: 'img/optimizadas/simpsons/abuemlo.webp' },
+  { id: 'simpsons-alcalde', category: 'simpsons', title: 'Los Simpsons · alcalde', src: 'img/optimizadas/simpsons/alcalde.webp' },
+  { id: 'simpsons-barto', category: 'simpsons', title: 'Los Simpsons · barto', src: 'img/optimizadas/simpsons/barto.webp' },
+  { id: 'simpsons-cerva', category: 'simpsons', title: 'Los Simpsons · cerva', src: 'img/optimizadas/simpsons/cerva.webp' },
+  { id: 'simpsons-crosty', category: 'simpsons', title: 'Los Simpsons · crosty', src: 'img/optimizadas/simpsons/crosty.webp' },
+  { id: 'simpsons-cura', category: 'simpsons', title: 'Los Simpsons · cura', src: 'img/optimizadas/simpsons/cura.webp' },
+  { id: 'simpsons-duffman', category: 'simpsons', title: 'Los Simpsons · duffman', src: 'img/optimizadas/simpsons/duffman.webp' },
+  { id: 'simpsons-famillia', category: 'simpsons', title: 'Los Simpsons · famillia', src: 'img/optimizadas/simpsons/famillia.webp' },
+  { id: 'simpsons-gorgory', category: 'simpsons', title: 'Los Simpsons · gorgory', src: 'img/optimizadas/simpsons/gorgory.webp' },
+  { id: 'simpsons-homer', category: 'simpsons', title: 'Los Simpsons · homer', src: 'img/optimizadas/simpsons/homer.webp' },
+  { id: 'simpsons-lisa', category: 'simpsons', title: 'Los Simpsons · lisa', src: 'img/optimizadas/simpsons/lisa.webp' },
+  { id: 'simpsons-maggi', category: 'simpsons', title: 'Los Simpsons · maggi', src: 'img/optimizadas/simpsons/maggi.webp' },
+  { id: 'simpsons-marguiee', category: 'simpsons', title: 'Los Simpsons · marguiee', src: 'img/optimizadas/simpsons/marguiee.webp' },
+  { id: 'simpsons-moes', category: 'simpsons', title: 'Los Simpsons · moes', src: 'img/optimizadas/simpsons/moes.webp' },
+  { id: 'simpsons-nedd', category: 'simpsons', title: 'Los Simpsons · nedd', src: 'img/optimizadas/simpsons/nedd.webp' },
+  { id: 'simpsons-nelson', category: 'simpsons', title: 'Los Simpsons · nelson', src: 'img/optimizadas/simpsons/nelson.webp' },
+  { id: 'simpsons-neneess', category: 'simpsons', title: 'Los Simpsons · neneess', src: 'img/optimizadas/simpsons/neneess.webp' },
+  { id: 'simpsons-nose', category: 'simpsons', title: 'Los Simpsons · nose', src: 'img/optimizadas/simpsons/nose.webp' },
+  { id: 'simpsons-noses', category: 'simpsons', title: 'Los Simpsons · noses', src: 'img/optimizadas/simpsons/noses.webp' },
+  { id: 'simpsons-profee', category: 'simpsons', title: 'Los Simpsons · profee', src: 'img/optimizadas/simpsons/profee.webp' },
+  { id: 'simpsons-raton', category: 'simpsons', title: 'Los Simpsons · raton', src: 'img/optimizadas/simpsons/raton.webp' },
+  { id: 'simpsons-selma', category: 'simpsons', title: 'Los Simpsons · selma', src: 'img/optimizadas/simpsons/selma.webp' },
+  { id: 'simpsons-smitter', category: 'simpsons', title: 'Los Simpsons · smitter', src: 'img/optimizadas/simpsons/smitter.webp' },
+  { id: 'simpsons-tev', category: 'simpsons', title: 'Los Simpsons · tev', src: 'img/optimizadas/simpsons/tev.webp' },
+  { id: 'simpsons-thomas', category: 'simpsons', title: 'Los Simpsons · thomas', src: 'img/optimizadas/simpsons/thomas.webp' },
+  { id: 'simpsons-vaquero', category: 'simpsons', title: 'Los Simpsons · vaquero', src: 'img/optimizadas/simpsons/vaquero.webp' },
+  { id: 'simpsons-vcina', category: 'simpsons', title: 'Los Simpsons · vcina', src: 'img/optimizadas/simpsons/vcina.webp' }
 ];
 
 const $ = (selector) => document.querySelector(selector);
@@ -98,12 +150,12 @@ function createSquareCanvas(source) {
     const image = new Image();
     image.decoding = 'async';
     image.onload = () => {
-      const side = Math.min(image.naturalWidth, image.naturalHeight);
-      if (!side) {
+      const longestSide = Math.max(image.naturalWidth, image.naturalHeight);
+      if (!longestSide) {
         reject(new Error('La imagen no tiene un tamaño válido.'));
         return;
       }
-      const outputSide = Math.min(side, MAX_IMAGE_SIDE);
+      const outputSide = Math.min(longestSide, MAX_IMAGE_SIDE);
       const canvas = document.createElement('canvas');
       canvas.width = outputSide;
       canvas.height = outputSide;
@@ -112,13 +164,15 @@ function createSquareCanvas(source) {
         reject(new Error('El navegador no puede preparar la imagen.'));
         return;
       }
-      const sourceX = (image.naturalWidth - side) / 2;
-      const sourceY = (image.naturalHeight - side) / 2;
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, outputSide, outputSide);
+      const scale = Math.min(outputSide / image.naturalWidth, outputSide / image.naturalHeight);
+      const drawWidth = Math.round(image.naturalWidth * scale);
+      const drawHeight = Math.round(image.naturalHeight * scale);
+      const drawX = Math.round((outputSide - drawWidth) / 2);
+      const drawY = Math.round((outputSide - drawHeight) / 2);
+      context.clearRect(0, 0, outputSide, outputSide);
       context.imageSmoothingEnabled = true;
       context.imageSmoothingQuality = 'high';
-      context.drawImage(image, sourceX, sourceY, side, side, 0, 0, outputSide, outputSide);
+      context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, drawX, drawY, drawWidth, drawHeight);
       resolve(canvas);
     };
     image.onerror = () => reject(new Error('No se pudo preparar la imagen.'));
@@ -146,6 +200,13 @@ async function createOptimizedImageBlob(source) {
       if (optimizedBlob.type === 'image/webp') return optimizedBlob;
     } catch {
       // Algunos Chromium antiguos no permiten exportar WebP desde canvas.
+    }
+    const context = canvas.getContext('2d');
+    if (context) {
+      context.globalCompositeOperation = 'destination-over';
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.globalCompositeOperation = 'source-over';
     }
     return await canvasToBlob(canvas, 'image/jpeg', .78);
   } finally {
@@ -263,6 +324,11 @@ function setGuide(showGuide) {
   const status = $('#guide-status');
   if (toggle) toggle.checked = state.showGuide;
   if (status) status.textContent = state.showGuide ? 'números visibles' : 'sin números';
+  const board = $('#puzzle-board');
+  if (board) {
+    board.classList.toggle('no-guide', !state.showGuide);
+    board.setAttribute('aria-label', `Puzzle de ${state.size} por ${state.size}. ${state.moves} movimientos.`);
+  }
 }
 
 function getSelectedGalleryPhoto() {

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#558736" />
   <title>RomaReto · Puzzle interactivo</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260917-full-image-catalog" />
   <link rel="preload" as="image" href="img/optimizadas/roma.webp" />
 </head>
 
@@ -183,16 +183,6 @@
           </div>
         </div>
 
-        <div class="guide-setting">
-          <label class="guide-control" for="guide-toggle">
-            <input id="guide-toggle" type="checkbox" aria-describedby="guide-description" />
-            <span class="guide-check" aria-hidden="true"></span>
-            <span class="guide-copy"><strong>Con guía</strong><small id="guide-description">Mostrar los números en cada
-                pieza</small></span>
-          </label>
-          <span class="guide-status" id="guide-status">sin números</span>
-        </div>
-
       </section>
     </main>
 
@@ -202,12 +192,12 @@
 
   <div class="game-screen hidden" id="game-screen">
     <header class="game-topbar">
-      <button class="back-button" id="back-to-setup" type="button"><span aria-hidden="true">←</span> Cambiar
-        imagen</button>
+      <button class="back-button game-brand-button" id="back-to-setup" type="button" aria-label="Volver a la configuración">
+        <img src="roma.svg" alt="Roma" />
+      </button>
       <div class="game-heading"><span class="eyebrow"><span class="eyebrow-dot"></span> partida en curso</span><strong
           id="game-mode-title">Modo normal</strong></div>
-      <button class="restart-button" id="restart-game" type="button"><span aria-hidden="true">↻</span> Volver a
-        mezclar</button>
+      <button class="restart-button" id="restart-game" type="button"><span aria-hidden="true">↻</span> Reiniciar</button>
     </header>
 
     <main class="game-layout">
@@ -233,11 +223,13 @@
           <div class="board-corner corner-br"></div>
         </div>
 
-        <div class="game-helper">
-          <span class="helper-icon" aria-hidden="true">✦</span>
-          <p><strong>¿Cómo jugar?</strong> Toca o arrastra una pieza alineada con el espacio vacío para mover toda la
-            fila.</p>
-          <span class="helper-key">toca para mover</span>
+        <div class="game-helper game-guide-setting">
+          <label class="guide-control" for="guide-toggle">
+            <input id="guide-toggle" type="checkbox" aria-describedby="guide-description" />
+            <span class="guide-check" aria-hidden="true"></span>
+            <span class="guide-copy"><strong>Con guía</strong><small id="guide-description">Mostrar números en las piezas</small></span>
+          </label>
+          <span class="guide-status" id="guide-status">sin números</span>
         </div>
       </section>
 
@@ -339,7 +331,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260917-low-memory"></script>
+  <script src="app.js?v=20260917-full-image-catalog"></script>
 </body>
 
 </html>
