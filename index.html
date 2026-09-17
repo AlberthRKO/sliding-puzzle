@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#558736" />
     <title>RomaReto · Puzzle interactivo</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="preload" as="image" href="img/optimizadas/roma.webp" />
   </head>
   <body>
     <div class="app-shell">
@@ -31,7 +32,7 @@
               Prepara tu imagen, elige la dificultad y empieza a jugar.
             </p>
             <div class="hero-pills" aria-label="Características del juego">
-              <span><b>60</b> segundos</span>
+              <span><b>01:30</b> límite base</span>
               <span><b>2</b> niveles</span>
               <span><b>∞</b> reintentos</span>
             </div>
@@ -67,7 +68,7 @@
 
             <div class="image-source-layout">
               <div class="preview-frame">
-                <img id="image-preview" alt="Vista previa de la imagen seleccionada" />
+                <img id="image-preview" src="img/optimizadas/roma.webp" alt="Vista previa de la imagen seleccionada" decoding="async" />
                 <div class="preview-overlay"><span>tu imagen</span><strong id="preview-caption">Ecosistema Roma</strong></div>
               </div>
               <div class="source-actions">
@@ -117,7 +118,7 @@
               <p class="section-number">02 / dificultad</p>
               <h2 id="mode-title">Elige tu desafío</h2>
             </div>
-            <p class="heading-note">Mismo tiempo. Distinto nivel de concentración.</p>
+            <p class="heading-note">Más mezcla. Más tiempo para resolver.</p>
           </div>
 
           <div class="mode-grid" role="radiogroup" aria-label="Selecciona la dificultad">
@@ -142,10 +143,10 @@
           </div>
 
           <div class="mix-grid" role="radiogroup" aria-label="Selecciona el nivel de mezcla">
-            <button class="mix-option active" type="button" data-difficulty="easy" role="radio" aria-checked="true">
+            <button class="mix-option" type="button" data-difficulty="easy" role="radio" aria-checked="false">
               <span class="mix-dot">01</span><span><strong>Fácil</strong><small>5–8 movimientos</small></span><span class="mix-check" aria-hidden="true">✓</span>
             </button>
-            <button class="mix-option" type="button" data-difficulty="normal" role="radio" aria-checked="false">
+            <button class="mix-option active" type="button" data-difficulty="normal" role="radio" aria-checked="true">
               <span class="mix-dot">02</span><span><strong>Normal</strong><small>10–15 movimientos</small></span><span class="mix-check" aria-hidden="true">✓</span>
             </button>
             <button class="mix-option" type="button" data-difficulty="hard" role="radio" aria-checked="false">
@@ -161,11 +162,11 @@
 
           <div class="guide-setting">
             <label class="guide-control" for="guide-toggle">
-              <input id="guide-toggle" type="checkbox" checked aria-describedby="guide-description" />
+              <input id="guide-toggle" type="checkbox" aria-describedby="guide-description" />
               <span class="guide-check" aria-hidden="true"></span>
               <span class="guide-copy"><strong>Con guía</strong><small id="guide-description">Mostrar los números en cada pieza</small></span>
             </label>
-            <span class="guide-status" id="guide-status">números visibles</span>
+            <span class="guide-status" id="guide-status">sin números</span>
           </div>
 
         </section>
@@ -185,7 +186,7 @@
         <section class="board-zone">
           <div class="game-overview">
             <div class="side-card reference-card mobile-reference">
-              <div class="reference-image-wrap"><img id="reference-image-mobile" alt="Imagen de referencia completa" /><span>referencia</span></div>
+              <div class="reference-image-wrap"><img id="reference-image-mobile" src="img/optimizadas/roma.webp" alt="Imagen de referencia completa" decoding="async" /><span>referencia</span></div>
             </div>
             <div class="game-stats">
               <div class="live-stat timer-stat"><span class="stat-label">tiempo restante</span><strong id="timer">01:00</strong><span class="timer-track"><i id="timer-bar"></i></span></div>
@@ -221,7 +222,7 @@
             <div class="side-card-row"><span>piezas bien ubicadas</span><strong id="correct-count">0 / 8</strong></div>
           </div>
           <div class="side-card reference-card desktop-reference">
-            <div class="reference-image-wrap"><img id="reference-image-desktop" alt="Imagen de referencia completa" /><span>referencia</span></div>
+            <div class="reference-image-wrap"><img id="reference-image-desktop" src="img/optimizadas/roma.webp" alt="Imagen de referencia completa" decoding="async" /><span>referencia</span></div>
           </div>
           <button class="side-new-button" id="side-new-image" type="button"><span aria-hidden="true">＋</span> Elegir otra imagen</button>
         </aside>
@@ -280,6 +281,6 @@
       </div>
     </div>
 
-    <script src="app.js?v=20260909-camera-orientation"></script>
+    <script src="app.js?v=20260917-low-memory"></script>
   </body>
 </html>

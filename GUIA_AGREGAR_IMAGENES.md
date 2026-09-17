@@ -5,7 +5,7 @@
 Abre `convertir-imagen.html` con Live Server y selecciona la imagen.
 
 - Usa recorte cuadrado `1:1`.
-- Tamaño recomendado: `1200 × 1200 px`.
+- Tamaño recomendado: `800 × 800 px` para mantener bajo el consumo de memoria del tótem.
 - Calidad WebP: `80%–85%`.
 - Descarga el original y la versión optimizada.
 

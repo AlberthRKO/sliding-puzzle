@@ -42,7 +42,7 @@ La carpeta optimizada usa `ninos` sin tilde para evitar problemas de rutas y nor
 ## Reglas de imágenes
 
 - Preferir imágenes cuadradas `1:1`.
-- Preparar la versión del juego con máximo `1200 × 1200 px`.
+- Para el banco del juego, preferir imágenes cuadradas de máximo `800 × 800 px`, especialmente por el tótem de 2 GB de RAM.
 - Usar WebP con calidad aproximada de `82%`.
 - Conservar una copia original fuera de `img/optimizadas/`.
 - No agregar imágenes pesadas directamente al catálogo.
@@ -71,12 +71,12 @@ La herramienta trabaja solo durante la sesión actual. No usa IndexedDB, localSt
 
 ## Cámara y memoria
 
-- La cámara solicita como máximo `1280 × 720` y `24 FPS`.
-- La captura se limita a `1200 × 1200` y se comprime a WebP.
+- La cámara solicita como máximo `960 × 540` y `20 FPS` para reducir carga en Chromium.
+- La captura se limita a `800 × 800` y se comprime a WebP.
 - No se mantienen dos streams de cámara al cambiar de dispositivo.
 - La cámara frontal y la webcam se muestran sin espejo.
-- Las imágenes subidas se manejan con `Object URL` y se convierten a un canvas máximo de `1200 × 1200`.
-- El juego espera el procesamiento de la imagen antes de iniciar para no usar el archivo original pesado.
+- Las imágenes subidas se muestran primero con `Object URL` y se convierten en segundo plano a un Blob WebP mediante un canvas máximo de `800 × 800`; no se usan Data URLs para evitar copias grandes en memoria.
+- El juego puede iniciar inmediatamente con el Object URL disponible; la optimización continúa en segundo plano y actualiza el tablero al terminar.
 
 ## Compatibilidad y pruebas
 

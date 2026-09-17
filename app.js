@@ -1,8 +1,8 @@
 const DEFAULT_IMAGE = 'img/optimizadas/roma.webp';
-const MAX_IMAGE_SIDE = 1200;
-const CAMERA_MAX_WIDTH = 1280;
-const CAMERA_MAX_HEIGHT = 720;
-const CAMERA_MAX_FPS = 24;
+const MAX_IMAGE_SIDE = 800;
+const CAMERA_MAX_WIDTH = 960;
+const CAMERA_MAX_HEIGHT = 540;
+const CAMERA_MAX_FPS = 20;
 
 const PHOTO_CATEGORIES = [
   { id: 'all', label: 'Todas' },
@@ -52,8 +52,8 @@ const state = {
   puzzleImageSrc: DEFAULT_IMAGE,
   imageName: 'Ecosistema Roma',
   mode: 'normal',
-  difficulty: 'easy',
-  showGuide: true,
+  difficulty: 'normal',
+  showGuide: false,
   galleryCategory: 'ninos',
   gallerySelectionId: 'roma',
   size: 3,
@@ -135,33 +135,34 @@ function canvasToBlob(canvas, type, quality) {
   });
 }
 
-function blobToDataUrl(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('No se pudo preparar la imagen.'));
-    reader.readAsDataURL(blob);
-  });
-}
-
 async function createOptimizedImageBlob(source) {
   const sourceUrl = source instanceof Blob ? URL.createObjectURL(source) : source;
+  let canvas = null;
   try {
-    const canvas = await createSquareCanvas(sourceUrl);
+    canvas = await createSquareCanvas(sourceUrl);
+    let optimizedBlob;
     try {
-      const webp = await canvasToBlob(canvas, 'image/webp', .82);
-      if (webp.type === 'image/webp') return webp;
-      return canvasToBlob(canvas, 'image/jpeg', .82);
+      optimizedBlob = await canvasToBlob(canvas, 'image/webp', .78);
+      if (optimizedBlob.type === 'image/webp') return optimizedBlob;
     } catch {
-      return canvasToBlob(canvas, 'image/jpeg', .82);
+      // Algunos Chromium antiguos no permiten exportar WebP desde canvas.
     }
+    return await canvasToBlob(canvas, 'image/jpeg', .78);
   } finally {
+    if (canvas) {
+      canvas.width = 1;
+      canvas.height = 1;
+    }
     if (source instanceof Blob) URL.revokeObjectURL(sourceUrl);
   }
 }
 
-function createSquareImage(source) {
-  return createOptimizedImageBlob(source).then(blobToDataUrl);
+function updateSelectedImagePreview(source) {
+  $('#image-preview').src = source;
+  ['#reference-image-mobile', '#reference-image-desktop'].forEach((selector) => {
+    const referenceImage = $(selector);
+    if (referenceImage) referenceImage.src = source;
+  });
 }
 
 function setImage(source, name = 'Imagen elegida') {
@@ -173,21 +174,32 @@ function setImage(source, name = 'Imagen elegida') {
   const requestId = ++state.imageRequestId;
   state.imageSrc = source;
   state.imageName = name;
+  state.puzzleImageSrc = source;
   $('#preview-caption').textContent = name.length > 24 ? `${name.slice(0, 23)}…` : name;
-  state.imageReadyPromise = createSquareImage(source).then((squareImage) => {
-    if (requestId !== state.imageRequestId) return squareImage;
+
+  // Las imágenes precargadas ya son WebP cuadradas: reprocesarlas duplicaba memoria
+  // y podía dejar la preview en blanco en el Chromium del tótem.
+  updateSelectedImagePreview(source);
+  const needsOptimization = source.startsWith('blob:') || source.startsWith('data:');
+  if (!needsOptimization) {
+    state.imageReadyPromise = Promise.resolve(source);
+    return;
+  }
+
+  state.imageReadyPromise = createOptimizedImageBlob(source).then((optimizedBlob) => {
+    const optimizedImage = URL.createObjectURL(optimizedBlob);
+    if (requestId !== state.imageRequestId) {
+      URL.revokeObjectURL(optimizedImage);
+      return source;
+    }
     if (state.imageObjectUrl === source) {
       URL.revokeObjectURL(state.imageObjectUrl);
-      state.imageObjectUrl = '';
     }
-    state.puzzleImageSrc = squareImage;
-    $('#image-preview').src = squareImage;
-    ['#reference-image-mobile', '#reference-image-desktop'].forEach((selector) => {
-      const referenceImage = $(selector);
-      if (referenceImage) referenceImage.src = squareImage;
-    });
+    state.imageObjectUrl = optimizedImage;
+    state.puzzleImageSrc = optimizedImage;
+    updateSelectedImagePreview(optimizedImage);
     if (state.status === 'playing') refreshTileImages();
-    return squareImage;
+    return optimizedImage;
   }).catch(() => {
     if (requestId !== state.imageRequestId) return source;
     if (state.imageObjectUrl === source) {
@@ -195,19 +207,15 @@ function setImage(source, name = 'Imagen elegida') {
       state.imageObjectUrl = '';
     }
     state.puzzleImageSrc = source;
-    $('#image-preview').src = source;
-    ['#reference-image-mobile', '#reference-image-desktop'].forEach((selector) => {
-      const referenceImage = $(selector);
-      if (referenceImage) referenceImage.src = source;
-    });
+    updateSelectedImagePreview(source);
     return source;
   });
 }
 
 function getTimeForSettings() {
   const times = {
-    normal: { easy: 90, normal: 120, hard: 150 },
-    hard: { easy: 150, normal: 180, hard: 210 }
+    normal: { easy: 60, normal: 90, hard: 120 },
+    hard: { easy: 120, normal: 150, hard: 180 }
   };
   return times[state.mode][state.difficulty];
 }
@@ -779,16 +787,10 @@ function describeCamera(device, index) {
 }
 
 function shouldMirrorCamera() {
-  const activeDevice = state.cameraDevices.find((device) => device.deviceId === state.activeCameraId);
-  const label = (activeDevice?.label || '').toLowerCase();
-  const isBackCamera = /back|rear|environment|trasera|posterior/.test(label);
-  const isMirroredCamera = /front|user|frontal|selfie|usb|webcam|external|externa|pc camera|logitech|integrated|built[- ]?in|facetime|hd camera/.test(label);
-
-  // Algunas webcams entregan el video espejado aunque no informen facingMode.
-  // Las cámaras traseras siempre deben conservar su orientación natural.
-  if (isBackCamera) return false;
-  if (isMirroredCamera) return true;
-  return state.cameraFacingMode === 'user' || state.cameraFacingMode === 'unknown';
+  // La foto del puzzle debe conservar la orientación natural en todos los
+  // dispositivos. En especial, no espejamos webcams USB: el navegador ya
+  // entrega su señal en la orientación que debe conservarse en la captura.
+  return false;
 }
 
 function updateCameraPresentation() {
@@ -929,11 +931,19 @@ function hasActiveCamera() {
   return Boolean(state.cameraStream?.getTracks().some((track) => track.readyState === 'live'));
 }
 
+function discardCapturedPhoto() {
+  if (state.capturedData?.startsWith('blob:') && state.capturedData !== state.imageObjectUrl) {
+    URL.revokeObjectURL(state.capturedData);
+  }
+  state.capturedData = null;
+}
+
 function pauseCameraPreview() {
   $('#camera-video').pause();
 }
 
 async function openCamera() {
+  discardCapturedPhoto();
   const video = $('#camera-video');
   updateCameraPresentation();
   $('#camera-modal').classList.remove('hidden');
@@ -968,10 +978,11 @@ async function openCamera() {
 
 function closeCamera() {
   pauseCameraPreview();
+  discardCapturedPhoto();
   $('#camera-modal').classList.add('hidden');
 }
 
-function capturePhoto() {
+async function capturePhoto() {
   const video = $('#camera-video');
   if (!video.videoWidth) return;
   const canvas = $('#camera-canvas');
@@ -994,8 +1005,14 @@ function capturePhoto() {
   } else {
     context.drawImage(video, sourceX, sourceY, sourceSide, sourceSide, 0, 0, canvas.width, canvas.height);
   }
-  const webpPhoto = canvas.toDataURL('image/webp', .82);
-  state.capturedData = webpPhoto.startsWith('data:image/webp') ? webpPhoto : canvas.toDataURL('image/jpeg', .82);
+  discardCapturedPhoto();
+  let photoBlob;
+  try {
+    photoBlob = await canvasToBlob(canvas, 'image/webp', .78);
+  } catch {
+    photoBlob = await canvasToBlob(canvas, 'image/jpeg', .78);
+  }
+  state.capturedData = URL.createObjectURL(photoBlob);
   $('#captured-image').src = state.capturedData;
   pauseCameraPreview();
   $('#camera-live').classList.add('hidden');
@@ -1007,7 +1024,8 @@ function capturePhoto() {
 
 setImage(DEFAULT_IMAGE, 'Ecosistema Roma');
 setMode('normal');
-setGuide(true);
+setDifficulty('normal');
+setGuide(false);
 
 $$('.mode-option').forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
 $$('.mix-option').forEach((button) => button.addEventListener('click', () => setDifficulty(button.dataset.difficulty)));
@@ -1022,8 +1040,7 @@ $('#start-button').addEventListener('click', async (event) => {
   state.starting = true;
   startButton.disabled = true;
   try {
-    // Esperamos el recorte optimizado para no iniciar el tablero con la imagen original pesada.
-    await state.imageReadyPromise;
+    // El source ya está disponible; no bloqueamos el tótem esperando una conversión.
     startGame();
   } finally {
     state.starting = false;
@@ -1052,11 +1069,19 @@ $('#camera-select').addEventListener('change', (event) => changeCamera(event.tar
 $('#switch-camera').addEventListener('click', cycleCamera);
 $('#retake-photo').addEventListener('click', openCamera);
 $('#use-photo').addEventListener('click', () => {
-  if (state.capturedData) setImage(state.capturedData, 'Foto tomada');
+  if (state.capturedData) {
+    const capturedPhoto = state.capturedData;
+    state.capturedData = null;
+    setImage(capturedPhoto, 'Foto tomada');
+  }
   closeCamera();
 });
 
-window.addEventListener('pagehide', stopCamera);
+window.addEventListener('pagehide', () => {
+  stopCamera();
+  discardCapturedPhoto();
+  if (state.imageObjectUrl) URL.revokeObjectURL(state.imageObjectUrl);
+});
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
